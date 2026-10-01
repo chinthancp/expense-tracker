@@ -1,152 +1,426 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Expense Ledger</title>
-  
+  <title>SpendWise — Expense, EMI & Rent Tracker</title>
+
+  <!-- PWA & Mobile Web Meta -->
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#2563eb">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/272/272525.png">
 
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.7); }
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="month"]::-webkit-calendar-picker-indicator { cursor: pointer; }
+    .dark input[type="date"]::-webkit-calendar-picker-indicator,
+    .dark input[type="month"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-16 antialiased">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-full transition-colors duration-200">
+  <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-120%] opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"></div>
 
-  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-30 px-4 py-3 sm:px-8">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-          <i class="fa-solid fa-wallet text-lg"></i>
+  <!-- Edit Expense Modal -->
+  <div id="editModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="edit-3" class="w-5 h-5 text-blue-500"></i> Edit Expense Entry
+        </h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form id="editExpenseForm" class="space-y-4">
+        <input type="hidden" id="editId">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Date</label>
+            <input type="date" id="editDate" required class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Amount (₹)</label>
+            <input type="number" id="editAmount" step="0.01" min="0.01" required class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
         </div>
         <div>
-          <h1 class="font-bold text-base sm:text-lg leading-tight">Expense Ledger</h1>
-          <p class="text-xs text-slate-400 flex items-center gap-1.5" id="syncStatus">
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Title / Description</label>
+          <input type="text" id="editTitle" required class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Category</label>
+            <select id="editCategory" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none" onchange="syncEditEssential()">
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Payment Method</label>
+            <select id="editPaymentMethod" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
+              <option value="Net Banking">Net Banking / Auto-Debit</option>
+              <option value="Credit Card">Credit Card</option>
+              <option value="Debit Card">Debit Card</option>
+              <option value="Cash">Cash</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+          <input type="checkbox" id="editIsEssential" class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500">
+          <label for="editIsEssential" class="text-xs sm:text-sm font-medium cursor-pointer">
+            Mark as Necessary / Essential Expense (Rent, EMI, Utilities, Transport)
+          </label>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm rounded-lg font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+          <button type="submit" id="editSubmitBtn" class="px-4 py-2 text-sm rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+          <i data-lucide="wallet-cards" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+            SpendWise
+          </h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5" id="syncStatus">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             Cloud Synced
           </p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <input type="month" id="monthSelector" class="bg-slate-800 border border-slate-700 text-xs sm:text-sm rounded-lg px-2.5 py-1.5 text-slate-200 outline-none focus:border-indigo-500">
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="relative flex items-center">
+          <input type="month" id="selectedMonthInput" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+        </div>
+
+        <div class="relative group">
+          <button id="backupBtn" class="p-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition flex items-center gap-1.5" title="Data Backup">
+            <i data-lucide="database" class="w-4 h-4 text-slate-500 dark:text-slate-400"></i>
+            <span class="hidden md:inline">Data</span>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+          </button>
+          <div class="absolute right-0 mt-1 w-48 py-1.5 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 hidden group-hover:block z-50">
+            <button onclick="exportToCSV()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-500"></i> Export to CSV
+            </button>
+            <button onclick="exportToJSON()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+              <i data-lucide="download" class="w-4 h-4 text-blue-500"></i> Export to JSON
+            </button>
+          </div>
+        </div>
+
+        <button onclick="toggleDarkMode()" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition" aria-label="Toggle Theme">
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+          <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-8 pt-6 space-y-6">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-      <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl">
-        <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Outflow</span>
-        <div class="text-xl sm:text-2xl font-bold mt-1 text-white" id="kpiTotal">₹0</div>
-        <div class="text-xs text-slate-500 mt-1" id="kpiMonthLabel">Selected month</div>
-      </div>
-      <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl">
-        <span class="text-xs text-rose-400 uppercase tracking-wider font-semibold">Fixed & Essential</span>
-        <div class="text-xl sm:text-2xl font-bold mt-1 text-rose-300" id="kpiEssential">₹0</div>
-        <div class="text-xs text-slate-500 mt-1">Rent, EMI, Utilities</div>
-      </div>
-      <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl">
-        <span class="text-xs text-amber-400 uppercase tracking-wider font-semibold">Flexible / Living</span>
-        <div class="text-xl sm:text-2xl font-bold mt-1 text-amber-300" id="kpiFlexible">₹0</div>
-        <div class="text-xs text-slate-500 mt-1">Food, leisure, shopping</div>
-      </div>
-      <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl">
-        <span class="text-xs text-indigo-400 uppercase tracking-wider font-semibold">Total Entries</span>
-        <div class="text-xl sm:text-2xl font-bold mt-1 text-indigo-300" id="kpiEntriesCount">0</div>
-        <div class="text-xs text-slate-500 mt-1">Logged transactions</div>
-      </div>
-    </div>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <section class="lg:col-span-5 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-xl h-fit">
-        <h2 class="font-bold text-slate-200 text-base mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-plus-circle text-indigo-400"></i> New Transaction
-        </h2>
-
-        <form id="expenseForm" class="space-y-4">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Date</label>
-              <input type="date" id="expDate" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Amount (₹)</label>
-              <input type="number" id="expAmount" step="0.01" min="1" placeholder="e.g. 1500" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500">
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-1">Description / Item</label>
-            <input type="text" id="expDesc" placeholder="e.g., Rent, Broadband, Petrol, Groceries" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500">
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Category</label>
-              <select id="expCategory" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500">
-                <option value="Rent">Rent (Essential)</option>
-                <option value="EMI">Loan / Card EMI (Essential)</option>
-                <option value="Utilities">Bills & Utilities (Essential)</option>
-                <option value="Groceries">Groceries & Daily Needs</option>
-                <option value="Commute">Transport & Fuel</option>
-                <option value="Dining">Dining & Delivery</option>
-                <option value="Shopping">Shopping & Tech</option>
-                <option value="Subscriptions">Subscriptions & Recharges</option>
-                <option value="Other">Other Outflow</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1">Payment Mode</label>
-              <select id="expPayment" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500">
-                <option value="UPI">UPI</option>
-                <option value="NetBanking">Net Banking / NEFT</option>
-                <option value="Credit Card">Credit Card</option>
-                <option value="Debit Card">Debit Card</option>
-                <option value="Cash">Cash</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/60 border border-slate-700/60">
-            <div>
-              <span class="text-xs font-semibold text-slate-200 block">Mark as Essential / Commitment</span>
-              <span class="text-[11px] text-slate-400">Fixed liabilities (Rent, EMI, Utilities)</span>
-            </div>
-            <input type="checkbox" id="expEssential" checked class="w-4 h-4 accent-indigo-500 cursor-pointer">
-          </div>
-
-          <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 text-sm">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Save Transaction
-          </button>
-        </form>
-      </section>
-
-      <section class="lg:col-span-7 space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="font-bold text-slate-200 text-base flex items-center gap-2">
-            <i class="fa-solid fa-list-check text-indigo-400"></i> Daily Expense Ledger
+    <!-- KPI Row -->
+    <section>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+        <div>
+          <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+            <span id="kpiMonthLabel">Overview</span>
           </h2>
-          <span class="text-xs text-slate-400" id="monthStatusSummary">Showing active month</span>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Total monthly outlays split between committed essentials and flexible spends.</p>
+        </div>
+        <div id="filterBadge" class="hidden sm:inline-flex items-center text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-medium">
+          Active Month View
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow transition-shadow">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+            <span>Total Outflow</span>
+            <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+              <i data-lucide="indian-rupee" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="statTotalAmount" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">₹0</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400 flex items-center gap-1">
+            <span id="statEntryCount">0</span> entries logged this month
+          </p>
+          <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
         </div>
 
-        <div id="expensesFeed" class="space-y-4">
-          <div class="text-center py-12 text-slate-500 text-sm">
-            <i class="fa-solid fa-spinner fa-spin text-xl mb-2 text-indigo-400 block"></i>
-            Loading synced entries...
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow transition-shadow">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+            <span>Essential / Fixed</span>
+            <div class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+            </div>
           </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="statEssentialAmount" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">₹0</span>
+            <span id="statEssentialPercent" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-1.5 py-0.5 rounded">0%</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400 truncate">Rent, EMIs, Utilities & Commute</p>
+          <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
         </div>
-      </section>
+
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow transition-shadow">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+            <span>Flexible / Lifestyle</span>
+            <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="statFlexibleAmount" class="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400">₹0</span>
+            <span id="statFlexiblePercent" class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 px-1.5 py-0.5 rounded">0%</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400 truncate">Dining, Shopping, Leisure & Misc</p>
+          <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+        </div>
+
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow transition-shadow">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+            <span>Daily Average Run-Rate</span>
+            <div class="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400">
+              <i data-lucide="calculator" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="statDailyAverage" class="text-2xl sm:text-3xl font-extrabold text-purple-600 dark:text-purple-400">₹0</span>
+            <span class="text-xs text-slate-400">/ day</span>
+          </div>
+          <p id="statActiveDays" class="mt-1 text-xs text-slate-400">Across 0 spending days</p>
+          <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Commitment Ratio Bar -->
+    <section class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Commitment Ratio:</span>
+          <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Essential: <span id="barEssentialTxt">0%</span>
+          </span>
+          <span class="text-sm font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1 ml-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> Flexible: <span id="barFlexibleTxt">0%</span>
+          </span>
+        </div>
+        <span class="text-xs text-slate-400">Ideal rule of thumb: Essentials ≤ 50-60% of total spend</span>
+      </div>
+      <div class="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 flex overflow-hidden">
+        <div id="barEssential" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+        <div id="barFlexible" class="bg-amber-500 h-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+    </section>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left: Form & Category Breakdown -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center font-bold">
+                <i data-lucide="plus-circle" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-bold text-slate-900 dark:text-white">Record Expense</h3>
+            </div>
+            <span class="text-xs text-slate-400 font-medium">Quick Entry</span>
+          </div>
+
+          <form id="expenseForm" class="space-y-4">
+            <div>
+              <label for="expenseDate" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                Transaction Date *
+              </label>
+              <input type="date" id="expenseDate" required class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="expenseAmount" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                  Amount (₹) *
+                </label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">₹</span>
+                  <input type="number" id="expenseAmount" step="0.01" min="0.01" required placeholder="0.00" class="w-full pl-8 pr-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+              </div>
+              <div>
+                <label for="paymentMethod" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                  Payment Mode
+                </label>
+                <select id="paymentMethod" class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+                  <option value="UPI">UPI (GPay/PhonePe)</option>
+                  <option value="Net Banking">Net Banking / Auto-Debit</option>
+                  <option value="Credit Card">Credit Card</option>
+                  <option value="Debit Card">Debit Card</option>
+                  <option value="Cash">Cash</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="expenseCategory" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Category *
+                </label>
+                <span id="categoryTypeBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                  Essential
+                </span>
+              </div>
+              <select id="expenseCategory" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+                <optgroup label="Essential / Fixed Commitments">
+                  <option value="Rent" data-essential="true">🏠 House Rent</option>
+                  <option value="EMI" data-essential="true">💳 Loan / Card EMI</option>
+                  <option value="Utilities & Bills" data-essential="true">⚡ Utilities & Bills (LPG, Wifi, Power)</option>
+                  <option value="Transport & Fuel" data-essential="true">⛽ Transport & Fuel</option>
+                  <option value="Groceries & Essentials" data-essential="true">🛒 Groceries & Household Essentials</option>
+                  <option value="Healthcare & Medicines" data-essential="true">💊 Healthcare & Medical</option>
+                </optgroup>
+                <optgroup label="Discretionary / Flexible Outflows">
+                  <option value="Dining & Takeout" data-essential="false">🍔 Dining Out & Food Delivery</option>
+                  <option value="Shopping & Tech" data-essential="false">🛍️ Shopping & Gadgets</option>
+                  <option value="Entertainment & OTT" data-essential="false">🎬 Entertainment & Subscriptions</option>
+                  <option value="Personal Care" data-essential="false">💇 Personal Care & Grooming</option>
+                  <option value="Travel & Leisure" data-essential="false">✈️ Travel & Leisure</option>
+                  <option value="Miscellaneous" data-essential="false">📦 Miscellaneous</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div>
+              <label for="expenseTitle" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                Description / Title *
+              </label>
+              <input type="text" id="expenseTitle" required placeholder="e.g. Rent, EMI, Swiggy, Fuel" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+            </div>
+
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" id="isEssentialCheck" class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300">
+                <div>
+                  <label for="isEssentialCheck" class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 cursor-pointer">
+                    Necessary / Essential Expense
+                  </label>
+                  <p class="text-[11px] text-slate-400">Classify as non-negotiable living cost (EMI, Rent, etc.)</p>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="addSubmitBtn" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 active:scale-[0.99] transition shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i> Add Expense Entry
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+            <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-500"></i> Category Breakdown
+            </h3>
+            <span class="text-xs text-slate-400" id="catMonthText">This Month</span>
+          </div>
+          <div id="categoryBreakdownList" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+
+      <!-- Right: Daily Logs & Totals -->
+      <div class="lg:col-span-7 space-y-4">
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+          
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <h3 class="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="calendar-days" class="w-5 h-5 text-blue-500"></i> Daily Log & Spending History
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Organized by date with auto-computed daily totals</p>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+              <select id="typeFilter" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none">
+                <option value="all">All Types</option>
+                <option value="essential">Essentials Only</option>
+                <option value="flexible">Flexible Only</option>
+              </select>
+
+              <div class="relative">
+                <input type="text" id="searchFilter" placeholder="Search description..." class="w-36 sm:w-44 px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+              <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Single Date Inspector:</span>
+              <input type="date" id="dateFilterInput" class="px-2.5 py-1 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none">
+              <button onclick="clearDateInspector()" id="clearDateBtn" class="hidden text-xs text-blue-600 dark:text-blue-400 hover:underline">Reset</button>
+            </div>
+            <div id="inspectorDailyTotalBadge" class="hidden sm:flex items-center gap-1.5 text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 px-3 py-1 rounded-lg">
+              <span>Date Total:</span>
+              <span id="inspectorTotalValue" class="text-blue-900 dark:text-blue-100 font-extrabold">₹0</span>
+            </div>
+          </div>
+
+          <div id="logsContainer" class="mt-5 space-y-6">
+            <div class="text-center py-12 text-slate-400">
+              <i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin text-blue-500"></i>
+              <p class="text-xs">Connecting to cloud ledger...</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </main>
 
+  <!-- Firebase Scripts & Main Application Engine -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -155,12 +429,11 @@
       addDoc, 
       onSnapshot, 
       deleteDoc, 
+      updateDoc,
       doc 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // =========================================================================
-    // PASTE YOUR FIREBASE CREDENTIALS HERE:
-    // =========================================================================
+    // --- Configured with your Firebase credentials ---
     const firebaseConfig = {
       apiKey: "AIzaSyB6LG6r5g-V1-QG0LMDyRsCRfbumclLVtY",
       authDomain: "spendwise-expense-tracke-6cd40.firebaseapp.com",
@@ -169,176 +442,573 @@
       messagingSenderId: "668909740220",
       appId: "1:668909740220:web:b6580a42769752dc7ef0b9"
     };
-    // =========================================================================
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const expensesCol = collection(db, "expenses");
 
-    let allExpenses = [];
+    const CATEGORY_MAP = {
+      'Rent': { icon: 'home', color: 'text-blue-500 bg-blue-50 dark:bg-blue-950/70', essential: true },
+      'EMI': { icon: 'credit-card', color: 'text-rose-500 bg-rose-50 dark:bg-rose-950/70', essential: true },
+      'Utilities & Bills': { icon: 'zap', color: 'text-amber-500 bg-amber-50 dark:bg-amber-950/70', essential: true },
+      'Transport & Fuel': { icon: 'car', color: 'text-cyan-500 bg-cyan-50 dark:bg-cyan-950/70', essential: true },
+      'Groceries & Essentials': { icon: 'shopping-cart', color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/70', essential: true },
+      'Healthcare & Medicines': { icon: 'heart-pulse', color: 'text-red-500 bg-red-50 dark:bg-red-950/70', essential: true },
+      'Dining & Takeout': { icon: 'utensils', color: 'text-orange-500 bg-orange-50 dark:bg-orange-950/70', essential: false },
+      'Shopping & Tech': { icon: 'shopping-bag', color: 'text-purple-500 bg-purple-50 dark:bg-purple-950/70', essential: false },
+      'Entertainment & OTT': { icon: 'tv', color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-950/70', essential: false },
+      'Personal Care': { icon: 'sparkle', color: 'text-pink-500 bg-pink-50 dark:bg-pink-950/70', essential: false },
+      'Travel & Leisure': { icon: 'plane', color: 'text-teal-500 bg-teal-50 dark:bg-teal-950/70', essential: false },
+      'Miscellaneous': { icon: 'package', color: 'text-slate-500 bg-slate-100 dark:bg-slate-800', essential: false }
+    };
 
-    const today = new Date().toISOString().split("T")[0];
-    document.getElementById("expDate").value = today;
-    document.getElementById("monthSelector").value = today.slice(0, 7);
+    let expenses = [];
+    let currentSelectedMonth = '';
 
-    document.getElementById("expCategory").addEventListener("change", (e) => {
-      const val = e.target.value;
-      const essentialCheckbox = document.getElementById("expEssential");
-      if (["Rent", "EMI", "Utilities"].includes(val)) {
-        essentialCheckbox.checked = true;
-      } else if (["Dining", "Shopping"].includes(val)) {
-        essentialCheckbox.checked = false;
-      }
-    });
-
-    onSnapshot(expensesCol, (snapshot) => {
-      allExpenses = [];
-      snapshot.forEach((docSnap) => {
-        allExpenses.push({ id: docSnap.id, ...docSnap.data() });
+    function formatINR(val) {
+      const num = Number(val) || 0;
+      return '₹' + num.toLocaleString('en-IN', {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: Number.isInteger(num) ? 0 : 2
       });
-      renderView();
-    }, (error) => {
-      console.error("Firebase sync error:", error);
-      document.getElementById("syncStatus").innerHTML = `
-        <span class="inline-block w-2 h-2 rounded-full bg-rose-500"></span>
-        Sync Error (Check Config / Rules)
-      `;
-    });
+    }
 
-    document.getElementById("expenseForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const submitBtn = document.getElementById("submitBtn");
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving...`;
+    function formatDisplayDate(dateStr) {
+      if (!dateStr) return '';
+      const [y, m, d] = dateStr.split('-');
+      const dateObj = new Date(Number(y), Number(m) - 1, Number(d));
+      return dateObj.toLocaleDateString('en-IN', {
+        weekday: 'short',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
 
-      const newExpense = {
-        date: document.getElementById("expDate").value,
-        amount: parseFloat(document.getElementById("expAmount").value),
-        description: document.getElementById("expDesc").value.trim(),
-        category: document.getElementById("expCategory").value,
-        payment: document.getElementById("expPayment").value,
-        isEssential: document.getElementById("expEssential").checked,
-        createdAt: new Date().toISOString()
-      };
-
-      try {
-        await addDoc(expensesCol, newExpense);
-        document.getElementById("expDesc").value = "";
-        document.getElementById("expAmount").value = "";
-      } catch (err) {
-        alert("Failed to save entry: " + err.message);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Save Transaction`;
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      if (type === 'success') {
+        toast.className = 'fixed top-5 right-5 z-50 transform translate-y-0 opacity-100 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white bg-slate-900 dark:bg-blue-600 border border-slate-700';
+      } else if (type === 'info') {
+        toast.className = 'fixed top-5 right-5 z-50 transform translate-y-0 opacity-100 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white bg-indigo-600';
+      } else {
+        toast.className = 'fixed top-5 right-5 z-50 transform translate-y-0 opacity-100 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white bg-rose-600';
       }
-    });
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-120%]', 'opacity-0');
+      }, 2600);
+    }
 
-    window.deleteExpense = async (id) => {
-      if (confirm("Delete this expense entry?")) {
+    window.toggleDarkMode = function() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('spendwise_theme', 'light');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('spendwise_theme', 'dark');
+      }
+      lucide.createIcons();
+    };
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('spendwise_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    function onCategorySelectChange() {
+      const catSelect = document.getElementById('expenseCategory');
+      const opt = catSelect.options[catSelect.selectedIndex];
+      const isEssential = opt.getAttribute('data-essential') === 'true';
+      const check = document.getElementById('isEssentialCheck');
+      const badge = document.getElementById('categoryTypeBadge');
+
+      check.checked = isEssential;
+      if (isEssential) {
+        badge.textContent = 'Essential';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300';
+      } else {
+        badge.textContent = 'Flexible';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300';
+      }
+    }
+    document.getElementById('expenseCategory').addEventListener('change', onCategorySelectChange);
+
+    function populateEditCategories() {
+      const editCat = document.getElementById('editCategory');
+      editCat.innerHTML = '';
+      Object.keys(CATEGORY_MAP).forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = (CATEGORY_MAP[cat].essential ? '📌 ' : '🔹 ') + cat;
+        editCat.appendChild(opt);
+      });
+    }
+
+    window.syncEditEssential = function() {
+      const cat = document.getElementById('editCategory').value;
+      const config = CATEGORY_MAP[cat];
+      if (config) {
+        document.getElementById('editIsEssential').checked = config.essential;
+      }
+    };
+
+    window.openEditModal = function(id) {
+      const item = expenses.find(x => x.id === id);
+      if (!item) return;
+
+      document.getElementById('editId').value = item.id;
+      document.getElementById('editDate').value = item.date;
+      document.getElementById('editAmount').value = item.amount;
+      document.getElementById('editTitle').value = item.title;
+      document.getElementById('editCategory').value = item.category;
+      document.getElementById('editPaymentMethod').value = item.paymentMethod || 'UPI';
+      document.getElementById('editIsEssential').checked = !!item.isEssential;
+
+      document.getElementById('editModal').classList.remove('hidden');
+      document.getElementById('editModal').classList.add('flex');
+      lucide.createIcons();
+    };
+
+    window.closeEditModal = function() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.getElementById('editModal').classList.remove('flex');
+    };
+
+    window.deleteExpense = async function(id) {
+      const target = expenses.find(x => x.id === id);
+      if (!target) return;
+      if (confirm(`Delete "${target.title}"?`)) {
         try {
           await deleteDoc(doc(db, "expenses", id));
-        } catch (err) {
-          alert("Error deleting: " + err.message);
+          showToast(`Removed "${target.title}"`, 'info');
+        } catch (e) {
+          showToast(e.message, 'error');
         }
       }
     };
 
-    document.getElementById("monthSelector").addEventListener("change", renderView);
+    window.clearDateInspector = function() {
+      document.getElementById('dateFilterInput').value = '';
+      renderApp();
+    };
 
-    function renderView() {
-      const selectedMonth = document.getElementById("monthSelector").value;
-      const monthExpenses = allExpenses.filter(item => item.date && item.date.startsWith(selectedMonth));
+    window.exportToCSV = function() {
+      if (expenses.length === 0) {
+        showToast('No expenses to export', 'error');
+        return;
+      }
+      const headers = ['ID', 'Date', 'Title', 'Category', 'Amount_INR', 'Payment_Method', 'Is_Essential'];
+      const rows = expenses.map(e => [
+        `"${e.id}"`,
+        `"${e.date}"`,
+        `"${(e.title || '').replace(/"/g, '""')}"`,
+        `"${e.category}"`,
+        e.amount,
+        `"${e.paymentMethod || 'UPI'}"`,
+        e.isEssential ? 'YES' : 'NO'
+      ]);
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `SpendWise_${currentSelectedMonth || 'All'}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Exported CSV successfully');
+    };
 
-      let totalOutflow = 0;
-      let totalEssential = 0;
-      let totalFlexible = 0;
+    window.exportToJSON = function() {
+      if (expenses.length === 0) {
+        showToast('No data to export', 'error');
+        return;
+      }
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(expenses, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `SpendWise_Backup_${currentSelectedMonth}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Backup JSON downloaded');
+    };
+
+    // Real-time Cloud Firestore Listener
+    onSnapshot(expensesCol, (snapshot) => {
+      expenses = [];
+      snapshot.forEach((docSnap) => {
+        expenses.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      document.getElementById("syncStatus").innerHTML = `
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        Cloud Synced
+      `;
+      renderApp();
+    }, (error) => {
+      console.error("Firestore sync error:", error);
+      document.getElementById("syncStatus").innerHTML = `
+        <span class="inline-block w-2 h-2 rounded-full bg-rose-500"></span>
+        Sync Error (Check Rules)
+      `;
+    });
+
+    // Add Expense Handler
+    document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const date = document.getElementById('expenseDate').value;
+      const amount = parseFloat(document.getElementById('expenseAmount').value);
+      const title = document.getElementById('expenseTitle').value.trim();
+      const category = document.getElementById('expenseCategory').value;
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      const isEssential = document.getElementById('isEssentialCheck').checked;
+
+      if (!date || isNaN(amount) || amount <= 0 || !title) {
+        showToast('Please fill all required fields correctly', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('addSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...`;
+      lucide.createIcons();
+
+      try {
+        await addDoc(expensesCol, {
+          date,
+          amount,
+          title,
+          category,
+          paymentMethod,
+          isEssential,
+          createdAt: Date.now()
+        });
+
+        const entryMonth = date.substring(0, 7);
+        if (entryMonth !== currentSelectedMonth) {
+          currentSelectedMonth = entryMonth;
+          document.getElementById('selectedMonthInput').value = currentSelectedMonth;
+        }
+
+        document.getElementById('expenseAmount').value = '';
+        document.getElementById('expenseTitle').value = '';
+        showToast(`Saved ₹${amount.toLocaleString('en-IN')} for ${title}`);
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="plus" class="w-4 h-4"></i> Add Expense Entry`;
+        lucide.createIcons();
+      }
+    });
+
+    // Edit Expense Handler
+    document.getElementById('editExpenseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const date = document.getElementById('editDate').value;
+      const amount = parseFloat(document.getElementById('editAmount').value);
+      const title = document.getElementById('editTitle').value.trim();
+      const category = document.getElementById('editCategory').value;
+      const paymentMethod = document.getElementById('editPaymentMethod').value;
+      const isEssential = document.getElementById('editIsEssential').checked;
+
+      if (!id || !date || isNaN(amount) || amount <= 0 || !title) {
+        showToast('Invalid field values', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('editSubmitBtn');
+      btn.disabled = true;
+      btn.innerText = 'Saving...';
+
+      try {
+        await updateDoc(doc(db, "expenses", id), {
+          date,
+          amount,
+          title,
+          category,
+          paymentMethod,
+          isEssential
+        });
+        closeEditModal();
+        showToast('Updated successfully');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Save Changes';
+      }
+    });
+
+    // Filter controls
+    document.getElementById('selectedMonthInput').addEventListener('change', (e) => {
+      currentSelectedMonth = e.target.value;
+      renderApp();
+    });
+    document.getElementById('typeFilter').addEventListener('change', renderApp);
+    document.getElementById('searchFilter').addEventListener('input', renderApp);
+    document.getElementById('dateFilterInput').addEventListener('change', renderApp);
+
+    function renderApp() {
+      const typeFilter = document.getElementById('typeFilter').value;
+      const searchQuery = document.getElementById('searchFilter').value.toLowerCase().trim();
+      const specificDate = document.getElementById('dateFilterInput').value;
+
+      if (currentSelectedMonth) {
+        const [y, m] = currentSelectedMonth.split('-');
+        const dateObj = new Date(Number(y), Number(m) - 1, 1);
+        const monthLabel = dateObj.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+        document.getElementById('kpiMonthLabel').textContent = `${monthLabel} Overview`;
+        document.getElementById('catMonthText').textContent = monthLabel;
+      }
+
+      const monthExpenses = expenses.filter(item => item.date && item.date.startsWith(currentSelectedMonth));
+
+      let totalMonthSpent = 0;
+      let essentialTotal = 0;
+      let flexibleTotal = 0;
+      const uniqueDaysWithSpending = new Set();
+      const categoryAggregates = {};
 
       monthExpenses.forEach(item => {
         const amt = Number(item.amount) || 0;
-        totalOutflow += amt;
+        totalMonthSpent += amt;
         if (item.isEssential) {
-          totalEssential += amt;
+          essentialTotal += amt;
         } else {
-          totalFlexible += amt;
+          flexibleTotal += amt;
         }
+        uniqueDaysWithSpending.add(item.date);
+        categoryAggregates[item.category] = (categoryAggregates[item.category] || 0) + amt;
       });
 
-      document.getElementById("kpiTotal").textContent = `₹${totalOutflow.toLocaleString("en-IN")}`;
-      document.getElementById("kpiEssential").textContent = `₹${totalEssential.toLocaleString("en-IN")}`;
-      document.getElementById("kpiFlexible").textContent = `₹${totalFlexible.toLocaleString("en-IN")}`;
-      document.getElementById("kpiEntriesCount").textContent = monthExpenses.length;
-      document.getElementById("monthStatusSummary").textContent = `Filtered: ${selectedMonth}`;
+      document.getElementById('statTotalAmount').textContent = formatINR(totalMonthSpent);
+      document.getElementById('statEntryCount').textContent = monthExpenses.length;
+      document.getElementById('statEssentialAmount').textContent = formatINR(essentialTotal);
+      document.getElementById('statFlexibleAmount').textContent = formatINR(flexibleTotal);
 
-      const feed = document.getElementById("expensesFeed");
-      if (monthExpenses.length === 0) {
-        feed.innerHTML = `
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-500">
-            <i class="fa-regular fa-calendar-xmark text-3xl mb-3 block"></i>
-            No expenses logged for this month yet.
+      const essentialPct = totalMonthSpent > 0 ? Math.round((essentialTotal / totalMonthSpent) * 100) : 0;
+      const flexiblePct = totalMonthSpent > 0 ? (100 - essentialPct) : 0;
+
+      document.getElementById('statEssentialPercent').textContent = `${essentialPct}%`;
+      document.getElementById('statFlexiblePercent').textContent = `${flexiblePct}%`;
+      document.getElementById('barEssentialTxt').textContent = `${essentialPct}% (${formatINR(essentialTotal)})`;
+      document.getElementById('barFlexibleTxt').textContent = `${flexiblePct}% (${formatINR(flexibleTotal)})`;
+
+      document.getElementById('barEssential').style.width = `${essentialPct}%`;
+      document.getElementById('barFlexible').style.width = `${flexiblePct}%`;
+
+      const daysCount = uniqueDaysWithSpending.size;
+      const dailyAverage = daysCount > 0 ? (totalMonthSpent / daysCount) : 0;
+      document.getElementById('statDailyAverage').textContent = formatINR(dailyAverage);
+      document.getElementById('statActiveDays').textContent = `Across ${daysCount} spending day${daysCount === 1 ? '' : 's'}`;
+
+      renderCategoryBreakdown(categoryAggregates, totalMonthSpent);
+
+      let displayItems = monthExpenses.filter(item => {
+        if (typeFilter === 'essential' && !item.isEssential) return false;
+        if (typeFilter === 'flexible' && item.isEssential) return false;
+        if (searchQuery && !item.title.toLowerCase().includes(searchQuery) && !item.category.toLowerCase().includes(searchQuery)) {
+          return false;
+        }
+        if (specificDate && item.date !== specificDate) {
+          return false;
+        }
+        return true;
+      });
+
+      const dateResetBtn = document.getElementById('clearDateBtn');
+      const inspectorBadge = document.getElementById('inspectorDailyTotalBadge');
+      if (specificDate) {
+        dateResetBtn.classList.remove('hidden');
+        inspectorBadge.classList.remove('hidden');
+        const specificDateTotal = displayItems.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+        document.getElementById('inspectorTotalValue').textContent = formatINR(specificDateTotal);
+      } else {
+        dateResetBtn.classList.add('hidden');
+        inspectorBadge.classList.add('hidden');
+      }
+
+      renderGroupedLogs(displayItems);
+      lucide.createIcons();
+    }
+
+    function renderCategoryBreakdown(aggregates, total) {
+      const container = document.getElementById('categoryBreakdownList');
+      const sortedCategories = Object.keys(aggregates).sort((a, b) => aggregates[b] - aggregates[a]);
+
+      if (sortedCategories.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-slate-400">
+            <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+            <p class="text-xs">No transactions recorded for this month</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      sortedCategories.forEach(cat => {
+        const amt = aggregates[cat];
+        const pct = total > 0 ? Math.round((amt / total) * 100) : 0;
+        const config = CATEGORY_MAP[cat] || { icon: 'tag', color: 'text-slate-500 bg-slate-100', essential: false };
+
+        html += `
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span class="p-1 rounded-md ${config.color}">
+                  <i data-lucide="${config.icon}" class="w-3.5 h-3.5"></i>
+                </span>
+                <span class="font-semibold text-slate-800 dark:text-slate-200">${cat}</span>
+                ${config.essential ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold">Fixed</span>' : ''}
+              </div>
+              <div class="text-right">
+                <span class="font-bold text-slate-900 dark:text-white">${formatINR(amt)}</span>
+                <span class="text-slate-400 text-[11px] ml-1">(${pct}%)</span>
+              </div>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div class="h-full bg-blue-500 rounded-full" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function renderGroupedLogs(items) {
+      const container = document.getElementById('logsContainer');
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 px-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+            <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-400">
+              <i data-lucide="receipt" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300">No expense entries found</h4>
+            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+              Add your bills, rent, or daily purchases using the form on the left to start tracking your daily and monthly outflows.
+            </p>
           </div>
         `;
         return;
       }
 
       const grouped = {};
-      monthExpenses.forEach(item => {
+      items.forEach(item => {
         if (!grouped[item.date]) grouped[item.date] = [];
         grouped[item.date].push(item);
       });
 
       const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+      let fullHTML = '';
 
-      feed.innerHTML = sortedDates.map(dateStr => {
-        const items = grouped[dateStr];
-        const dayTotal = items.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
-        
-        const dateObj = new Date(dateStr + "T00:00:00");
-        const formattedDate = dateObj.toLocaleDateString("en-IN", {
-          weekday: "short",
-          day: "2-digit",
-          month: "short",
-          year: "numeric"
-        });
+      sortedDates.forEach(date => {
+        const dayItems = grouped[date];
+        const dailyTotal = dayItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+        const readableDate = formatDisplayDate(date);
+        const todayStr = new Date().toISOString().split('T')[0];
+        const isToday = date === todayStr;
 
-        const rows = items.map(item => `
-          <div class="flex items-center justify-between p-3 border-b border-slate-800/80 last:border-b-0 hover:bg-slate-800/40 transition">
-            <div class="flex items-center gap-3">
-              <span class="w-2 h-2 rounded-full ${item.isEssential ? 'bg-rose-400' : 'bg-amber-400'}"></span>
-              <div>
-                <p class="text-sm font-semibold text-slate-200">${item.description}</p>
-                <div class="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                  <span class="bg-slate-800 px-2 py-0.5 rounded text-[11px]">${item.category}</span>
-                  <span>•</span>
-                  <span>${item.payment}</span>
+        fullHTML += `
+          <div class="rounded-xl border border-slate-200/90 dark:border-slate-800/90 bg-white dark:bg-slate-900/60 overflow-hidden shadow-sm">
+            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4 text-blue-500"></i>
+                <span class="font-bold text-sm text-slate-900 dark:text-white">${readableDate}</span>
+                ${isToday ? '<span class="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full bg-blue-600 text-white">Today</span>' : ''}
+              </div>
+              <div class="flex items-center gap-1.5 bg-white dark:bg-slate-900 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700/80 shadow-xs">
+                <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Spent:</span>
+                <span class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">${formatINR(dailyTotal)}</span>
+              </div>
+            </div>
+
+            <div class="divide-y divide-slate-100 dark:divide-slate-800/60">
+        `;
+
+        dayItems.forEach(item => {
+          const config = CATEGORY_MAP[item.category] || { icon: 'tag', color: 'text-slate-500 bg-slate-100', essential: false };
+          
+          fullHTML += `
+            <div class="p-3.5 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors group">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${config.color}">
+                  <i data-lucide="${config.icon}" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(item.title)}</span>
+                    ${item.isEssential ? 
+                      '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">Essential</span>' : 
+                      '<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">Flexible</span>'
+                    }
+                  </div>
+                  <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
+                    <span>${item.category}</span>
+                    <span>•</span>
+                    <span class="flex items-center gap-1 font-medium text-slate-500 dark:text-slate-400">
+                      <i data-lucide="credit-card" class="w-3 h-3"></i> ${item.paymentMethod || 'UPI'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 shrink-0">
+                <div class="text-right">
+                  <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">${formatINR(item.amount)}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button onclick="openEditModal('${item.id}')" class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Edit">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button onclick="deleteExpense('${item.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Delete">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
                 </div>
               </div>
             </div>
-            <div class="flex items-center gap-3">
-              <span class="font-bold text-sm text-slate-100">₹${Number(item.amount).toLocaleString("en-IN")}</span>
-              <button onclick="window.deleteExpense('${item.id}')" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Delete">
-                <i class="fa-regular fa-trash-can text-xs"></i>
-              </button>
-            </div>
-          </div>
-        `).join("");
+          `;
+        });
 
-        return `
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-            <div class="bg-slate-800/70 px-4 py-2.5 flex items-center justify-between border-b border-slate-800">
-              <span class="font-semibold text-xs text-slate-300 flex items-center gap-1.5">
-                <i class="fa-regular fa-calendar text-indigo-400"></i> ${formattedDate}
-              </span>
-              <span class="text-xs font-bold text-slate-200">
-                Daily Total: <span class="text-emerald-400">₹${dayTotal.toLocaleString("en-IN")}</span>
-              </span>
-            </div>
-            <div class="divide-y divide-slate-800/60">
-              ${rows}
+        fullHTML += `
             </div>
           </div>
         `;
-      }).join("");
+      });
+
+      container.innerHTML = fullHTML;
     }
+
+    function escapeHtml(string) {
+      return String(string)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Startup initialization
+    initTheme();
+    const today = new Date();
+    const yr = today.getFullYear();
+    const mo = String(today.getMonth() + 1).padStart(2, '0');
+    const da = String(today.getDate()).padStart(2, '0');
+    
+    document.getElementById('expenseDate').value = `${yr}-${mo}-${da}`;
+    currentSelectedMonth = `${yr}-${mo}`;
+    document.getElementById('selectedMonthInput').value = currentSelectedMonth;
+
+    populateEditCategories();
+    onCategorySelectChange();
+    lucide.createIcons();
   </script>
 </body>
 </html>
