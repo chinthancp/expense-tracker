@@ -329,7 +329,7 @@
                 </optgroup>
                 <optgroup label="Discretionary / Flexible Outflows">
                   <option value="Dining & Takeout" data-essential="false">🍔 Dining Out & Food Delivery</option>
-                  <option value="Shopping & Tech" data-essential="false">🛍️ Shopping & Gadgets</option>
+                  <option value="Shopping & Tech" data-essential="false">🛍️️ Shopping & Gadgets</option>
                   <option value="Entertainment & OTT" data-essential="false">🎬 Entertainment & Subscriptions</option>
                   <option value="Personal Care" data-essential="false">💇 Personal Care & Grooming</option>
                   <option value="Travel & Leisure" data-essential="false">✈️ Travel & Leisure</option>
@@ -586,6 +586,18 @@
     }
     document.getElementById('expenseCategory').addEventListener('change', onCategorySelectChange);
 
+    // Prevent typing 'e', 'E', '+', or '-' in numeric amount inputs
+    document.getElementById('expenseAmount').addEventListener('keydown', (e) => {
+      if (['e', 'E', '+', '-'].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+    document.getElementById('editAmount').addEventListener('keydown', (e) => {
+      if (['e', 'E', '+', '-'].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+
     function populateEditCategories() {
       const editCat = document.getElementById('editCategory');
       editCat.innerHTML = '';
@@ -686,7 +698,7 @@
       window.showToast('Backup JSON downloaded');
     };
 
-    // Dynamic Network & Sync Status Manager
+    // Robust Real-time Network & Sync Status Manager
     function updateNetworkStatus() {
       const statusEl = document.getElementById("syncStatus");
       if (!navigator.onLine) {
@@ -721,7 +733,7 @@
       `;
     });
 
-    // Add Expense Handler
+    // Add Expense Handler (Non-blocking offline write queue)
     document.getElementById('expenseForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const date = document.getElementById('expenseDate').value;
@@ -740,6 +752,13 @@
       btn.disabled = true;
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...`;
       lucide.createIcons();
+
+      // Instantly reset button so multiple offline entries can be added rapidly without getting stuck
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="plus" class="w-4 h-4"></i> Add Expense Entry`;
+        lucide.createIcons();
+      }, 400);
 
       try {
         await addDoc(expensesCol, {
@@ -763,10 +782,6 @@
         window.showToast(`Saved ₹${amount.toLocaleString('en-IN')} for ${title}`);
       } catch (err) {
         window.showToast(err.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="plus" class="w-4 h-4"></i> Add Expense Entry`;
-        lucide.createIcons();
       }
     });
 
