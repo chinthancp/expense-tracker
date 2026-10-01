@@ -55,7 +55,7 @@
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-full transition-colors duration-200">
   <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-120%] opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"></div>
 
-  <!-- Refined Authentication Modal -->
+  <!-- Authentication Modal -->
   <div id="authModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-5 relative">
       <button onclick="closeAuthModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
@@ -70,13 +70,11 @@
         <p id="authModalSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Sign in to access your secure expense ledger.</p>
       </div>
 
-      <!-- In-Modal Error Display Box -->
       <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-xs font-semibold flex items-start gap-2">
         <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
         <span id="authErrorText">Error message goes here</span>
       </div>
 
-      <!-- Google Sign-In Button (Available in Sign In mode) -->
       <div id="googleAuthWrapper">
         <button type="button" onclick="handleGoogleLogin()" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center justify-center gap-3 shadow-xs cursor-pointer">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.33 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.18C.43 8.13 0 9.87 0 12s.43 3.87 1.18 5.39l4.09-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.16 2.67 1.18 6.61l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
@@ -90,7 +88,6 @@
         </div>
       </div>
 
-      <!-- Email Authentication Form -->
       <form id="emailAuthForm" class="space-y-3.5">
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Email Address</label>
@@ -101,7 +98,6 @@
           <input type="password" id="authPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         
-        <!-- Confirm Password field (Only visible in Create Account mode) -->
         <div id="confirmPasswordGroup" class="hidden">
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Confirm Password</label>
           <input type="password" id="authConfirmPassword" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
@@ -114,12 +110,71 @@
         </div>
       </form>
 
-      <!-- Toggle between Sign In and Create Account -->
       <div class="text-center pt-2 border-t border-slate-100 dark:border-slate-800">
         <p id="authToggleText" class="text-xs text-slate-500 dark:text-slate-400">
           Don't have an account? 
           <button type="button" onclick="toggleAuthMode()" class="text-blue-600 dark:text-blue-400 font-bold hover:underline cursor-pointer">Create Account</button>
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile & Settings Modal -->
+  <div id="profileModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-6 relative">
+      <button onclick="closeProfileModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center font-bold">
+          <i data-lucide="user-cog" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg text-slate-900 dark:text-white">Profile & Settings</h3>
+          <p class="text-xs text-slate-400">Manage your account details and security</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Display Name</label>
+          <div class="flex gap-2">
+            <input type="text" id="profileDisplayNameInput" placeholder="Enter your name" class="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
+            <button onclick="saveProfileDisplayName()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition cursor-pointer">Save</button>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Danger Zone</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Deleting your account will schedule all your data for permanent deletion. You have a <strong>7-day window</strong> to log back in and restore your account.
+          </p>
+          <button onclick="requestAccountDeletion()" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 hover:bg-rose-100 transition cursor-pointer">
+            Delete Account Permanently
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Recovery Modal (Shown if user logs in within 7 days of scheduled deletion) -->
+  <div id="recoveryModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-5 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto">
+        <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+      </div>
+      <h3 class="text-xl font-extrabold text-slate-900 dark:text-white">Account Pending Deletion</h3>
+      <p id="recoveryMessage" class="text-xs text-slate-500 dark:text-slate-400">
+        Your account was scheduled for deletion. Would you like to restore your account and cancel the deletion?
+      </p>
+      <div class="flex gap-2 pt-2">
+        <button onclick="restoreAccount()" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700 transition cursor-pointer">
+          Restore Account
+        </button>
+        <button onclick="handleLogout()" class="py-3 px-4 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition cursor-pointer">
+          Log Out
+        </button>
       </div>
     </div>
   </div>
@@ -227,7 +282,7 @@
           <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
         </button>
 
-        <!-- Dynamic Auth Button (Sign In / User Profile) -->
+        <!-- Dynamic Auth Button / Profile Dropdown -->
         <div id="authContainer">
           <button onclick="openAuthModal()" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer">
             <i data-lucide="user" class="w-4 h-4"></i> Sign In
@@ -518,6 +573,8 @@
       onSnapshot, 
       deleteDoc, 
       updateDoc,
+      setDoc,
+      getDoc,
       doc 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import {
@@ -528,7 +585,8 @@
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
       sendEmailVerification,
-      signOut
+      signOut,
+      deleteUser
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     // --- Configured with your Firebase credentials ---
@@ -548,6 +606,7 @@
     });
 
     let currentUser = null;
+    let userProfile = null;
     let expensesCol = null;
     let unsubscribeExpenses = null;
     let expenses = [];
@@ -613,7 +672,7 @@
       box.classList.add('hidden');
     }
 
-    // --- Modal & Mode Controls ---
+    // --- Modal & Dropdown Controls ---
     window.openAuthModal = function() {
       isSignUpMode = false;
       updateAuthModalUI();
@@ -635,6 +694,37 @@
       isSignUpMode = !isSignUpMode;
       clearAuthError();
       updateAuthModalUI();
+    };
+
+    window.toggleProfileDropdown = function(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('profileDropdownMenu');
+      if (menu) menu.classList.toggle('hidden');
+    };
+
+    window.closeProfileDropdown = function() {
+      const menu = document.getElementById('profileDropdownMenu');
+      if (menu) menu.classList.add('hidden');
+    };
+
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('profileDropdownWrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        window.closeProfileDropdown();
+      }
+    });
+
+    window.openProfileModal = function() {
+      window.closeProfileDropdown();
+      document.getElementById('profileDisplayNameInput').value = userProfile?.displayName || currentUser?.displayName || '';
+      document.getElementById('profileModal').classList.remove('hidden');
+      document.getElementById('profileModal').classList.add('flex');
+      lucide.createIcons();
+    };
+
+    window.closeProfileModal = function() {
+      document.getElementById('profileModal').classList.add('hidden');
+      document.getElementById('profileModal').classList.remove('flex');
     };
 
     function updateAuthModalUI() {
@@ -667,7 +757,8 @@
       clearAuthError();
       const provider = new GoogleAuthProvider();
       try {
-        await signInWithPopup(auth, provider);
+        const result = await signInWithPopup(auth, provider);
+        await checkAndInitializeUser(result.user);
         closeAuthModal();
         window.showToast('Signed in with Google successfully!');
       } catch (err) {
@@ -695,6 +786,7 @@
         try {
           const userCred = await createUserWithEmailAndPassword(auth, email, password);
           await sendEmailVerification(userCred.user);
+          await checkAndInitializeUser(userCred.user);
           closeAuthModal();
           window.showToast('Account created! Verification email sent.', 'info');
         } catch (err) {
@@ -702,7 +794,8 @@
         }
       } else {
         try {
-          await signInWithEmailAndPassword(auth, email, password);
+          const userCred = await signInWithEmailAndPassword(auth, email, password);
+          await checkAndInitializeUser(userCred.user);
           closeAuthModal();
           window.showToast('Signed in successfully!');
         } catch (err) {
@@ -712,6 +805,8 @@
     });
 
     window.handleLogout = async function() {
+      window.closeProfileDropdown();
+      document.getElementById('recoveryModal').classList.add('hidden');
       if (confirm('Are you sure you want to log out?')) {
         try {
           await signOut(auth);
@@ -722,23 +817,106 @@
       }
     };
 
+    // --- Profile & 7-Day Soft Deletion Management ---
+    async function checkAndInitializeUser(user) {
+      const userDocRef = doc(db, "users", user.uid, "profile", "info");
+      const snap = await getDoc(userDocRef);
+
+      if (!snap.exists()) {
+        // Initial setup for new user
+        const initialProfile = {
+          displayName: user.displayName || user.email.split('@')[0],
+          email: user.email,
+          status: 'active',
+          deletedAt: null,
+          createdAt: Date.now()
+        };
+        await setDoc(userDocRef, initialProfile);
+        userProfile = initialProfile;
+      } else {
+        userProfile = snap.data();
+        // Check if account is pending deletion
+        if (userProfile.status === 'pending_deletion' && userProfile.deletedAt) {
+          const daysPassed = (Date.now() - userProfile.deletedAt) / (1000 * 60 * 60 * 24);
+          if (daysPassed <= 7) {
+            // Within 7 days recovery window -> Show Recovery Modal
+            document.getElementById('recoveryModal').classList.remove('hidden');
+            document.getElementById('recoveryModal').classList.add('flex');
+          } else {
+            // Past 7 days -> Permanent wipe simulation
+            await signOut(auth);
+            alert('Your account deletion period has expired. This account has been permanently purged.');
+          }
+        }
+      }
+    }
+
+    window.restoreAccount = async function() {
+      if (!currentUser) return;
+      try {
+        const userDocRef = doc(db, "users", currentUser.uid, "profile", "info");
+        await updateDoc(userDocRef, {
+          status: 'active',
+          deletedAt: null
+        });
+        userProfile.status = 'active';
+        userProfile.deletedAt = null;
+        document.getElementById('recoveryModal').classList.add('hidden');
+        document.getElementById('recoveryModal').classList.remove('flex');
+        window.showToast('Account restored successfully!');
+      } catch (err) {
+        window.showToast(err.message, 'error');
+      }
+    };
+
+    window.saveProfileDisplayName = async function() {
+      if (!currentUser) return;
+      const newName = document.getElementById('profileDisplayNameInput').value.trim();
+      if (!newName) {
+        window.showToast('Display name cannot be empty', 'error');
+        return;
+      }
+
+      try {
+        const userDocRef = doc(db, "users", currentUser.uid, "profile", "info");
+        await updateDoc(userDocRef, { displayName: newName });
+        userProfile.displayName = newName;
+        closeProfileModal();
+        updateHeaderAuthUI();
+        window.showToast('Profile updated successfully!');
+      } catch (err) {
+        window.showToast(err.message, 'error');
+      }
+    };
+
+    window.requestAccountDeletion = async function() {
+      if (!currentUser) return;
+      if (confirm('Are you sure you want to delete your account? All your data will be scheduled for permanent removal in 7 days.')) {
+        try {
+          const userDocRef = doc(db, "users", currentUser.uid, "profile", "info");
+          await updateDoc(userDocRef, {
+            status: 'pending_deletion',
+            deletedAt: Date.now()
+          });
+          closeProfileModal();
+          await signOut(auth);
+          window.showToast('Account scheduled for deletion. You have 7 days to restore it by logging back in.', 'info');
+        } catch (err) {
+          window.showToast(err.message, 'error');
+        }
+      }
+    };
+
     // --- Auth State Observer ---
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       currentUser = user;
-      const authContainer = document.getElementById('authContainer');
 
       if (user) {
-        authContainer.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="hidden md:inline text-xs font-semibold text-slate-600 dark:text-slate-300 truncate max-w-[140px]">${user.email || 'User'}</span>
-            <button onclick="handleLogout()" class="px-3 py-1.5 text-xs font-bold rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition flex items-center gap-1.5 cursor-pointer" title="Log Out">
-              <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Logout
-            </button>
-          </div>
-        `;
+        await checkAndInitializeUser(user);
+        if (userProfile && userProfile.status === 'pending_deletion') return; // Handled by recovery modal
+        updateHeaderAuthUI();
 
         expensesCol = collection(db, "users", user.uid, "expenses");
-        
         if (unsubscribeExpenses) unsubscribeExpenses();
         unsubscribeExpenses = onSnapshot(expensesCol, (snapshot) => {
           expenses = [];
@@ -751,18 +929,57 @@
         });
 
       } else {
-        authContainer.innerHTML = `
-          <button onclick="openAuthModal()" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="user" class="w-4 h-4"></i> Sign In
-          </button>
-        `;
-
+        userProfile = null;
+        updateHeaderAuthUI();
         if (unsubscribeExpenses) unsubscribeExpenses();
         expenses = [];
         renderApp();
       }
       lucide.createIcons();
     });
+
+    function updateHeaderAuthUI() {
+      const authContainer = document.getElementById('authContainer');
+
+      if (currentUser) {
+        const displayName = userProfile?.displayName || currentUser.displayName || currentUser.email.split('@')[0];
+        const initials = displayName.substring(0, 2).toUpperCase();
+
+        authContainer.innerHTML = `
+          <div class="relative" id="profileDropdownWrapper">
+            <button onclick="toggleProfileDropdown(event)" class="px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-2 cursor-pointer">
+              <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-extrabold">${initials}</div>
+              <span class="max-w-[100px] sm:max-w-[140px] truncate">${displayName}</span>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+            </button>
+
+            <div id="profileDropdownMenu" class="absolute right-0 top-full mt-1.5 w-52 py-1.5 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 hidden z-50">
+              <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-700/60">
+                <p class="text-xs font-bold text-slate-900 dark:text-white truncate">${displayName}</p>
+                <p class="text-[11px] text-slate-400 truncate">${currentUser.email}</p>
+              </div>
+              <button type="button" onclick="openProfileModal()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer">
+                <i data-lucide="user" class="w-4 h-4 text-blue-500"></i> Profile
+              </button>
+              <button type="button" onclick="openProfileModal()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer">
+                <i data-lucide="settings" class="w-4 h-4 text-amber-500"></i> Settings & Danger Zone
+              </button>
+              <div class="h-px bg-slate-100 dark:bg-slate-700/60 my-1"></div>
+              <button type="button" onclick="handleLogout()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-600 dark:text-rose-400 cursor-pointer">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        authContainer.innerHTML = `
+          <button onclick="openAuthModal()" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="user" class="w-4 h-4"></i> Sign In
+          </button>
+        `;
+      }
+      lucide.createIcons();
+    }
 
     // --- App Logic & Event Listeners ---
     const CATEGORY_MAP = {
