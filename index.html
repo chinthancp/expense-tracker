@@ -50,7 +50,7 @@
     input[type="month"]::-webkit-calendar-picker-indicator { cursor: pointer; }
     .dark input[type="date"]::-webkit-calendar-picker-indicator,
     .dark input[type="month"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
-    .animate-fade-in { animation: fadeIn 0.25s ease-out forwards; }
+    .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
@@ -124,7 +124,7 @@
     </div>
   </div>
 
-  <!-- Profile & Settings Modal (Includes Monthly Budget Setup) -->
+  <!-- Profile & Settings Modal -->
   <div id="profileModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-800 p-8 space-y-6 relative animate-fade-in">
       <button onclick="closeProfileModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-200 cursor-pointer">
@@ -273,6 +273,7 @@
           <input type="month" id="selectedMonthInput" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 bg-slate-800 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
         </div>
 
+        <!-- Export/Import Options Dropdown Button -->
         <div class="relative" id="backupDropdownWrapper">
           <button type="button" id="backupBtn" onclick="toggleBackupMenu(event)" class="p-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Data Backup">
             <i data-lucide="database" class="w-4 h-4 text-slate-400"></i>
@@ -280,7 +281,7 @@
             <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
           </button>
           
-          <div id="backupDropdownMenu" class="absolute right-0 top-full mt-1.5 w-48 py-1.5 bg-slate-800 rounded-xl shadow-xl border border-slate-700 hidden z-50">
+          <div id="backupDropdownMenu" class="absolute right-0 top-full mt-1.5 w-48 py-1.5 bg-slate-800 rounded-xl shadow-xl border border-slate-700 hidden z-50 animate-fade-in">
             <button type="button" onclick="exportToCSV(); closeBackupMenu();" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-700 flex items-center gap-2 text-slate-200 cursor-pointer">
               <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i> Export to CSV
             </button>
@@ -290,6 +291,11 @@
           </div>
         </div>
 
+        <button onclick="toggleDarkMode()" class="p-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer" aria-label="Toggle Theme" title="Theme Toggle (Dark Only)">
+          <i data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Dynamic Auth Button / Profile Dropdown -->
         <div id="authContainer">
           <button onclick="openAuthModal()" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer">
             <i data-lucide="user" class="w-4 h-4"></i> Sign In
@@ -381,7 +387,6 @@
 
     <!-- Budget Progress Bar & Commitment Ratio -->
     <section class="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-sm space-y-4">
-      <!-- Monthly Budget Progress -->
       <div id="budgetProgressSection">
         <div class="flex justify-between items-center text-xs mb-1.5">
           <span class="font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
@@ -394,7 +399,6 @@
         </div>
       </div>
 
-      <!-- Commitment Ratio -->
       <div class="pt-3 border-t border-slate-800">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
           <div class="flex items-center gap-2">
@@ -715,8 +719,22 @@
       updateAuthModalUI();
     };
 
+    // --- Dropdown Management (Mutual Exclusivity & Click-Away) ---
+    window.toggleBackupMenu = function(e) {
+      e.stopPropagation();
+      closeProfileDropdown();
+      const menu = document.getElementById('backupDropdownMenu');
+      menu.classList.toggle('hidden');
+    };
+
+    window.closeBackupMenu = function() {
+      const menu = document.getElementById('backupDropdownMenu');
+      if (menu) menu.classList.add('hidden');
+    };
+
     window.toggleProfileDropdown = function(e) {
       e.stopPropagation();
+      closeBackupMenu();
       const menu = document.getElementById('profileDropdownMenu');
       if (menu) menu.classList.toggle('hidden');
     };
@@ -726,11 +744,10 @@
       if (menu) menu.classList.add('hidden');
     };
 
+    // Close all dropdowns when clicking anywhere outside
     document.addEventListener('click', (e) => {
-      const wrapper = document.getElementById('profileDropdownWrapper');
-      if (wrapper && !wrapper.contains(e.target)) {
-        window.closeProfileDropdown();
-      }
+      window.closeBackupMenu();
+      window.closeProfileDropdown();
     });
 
     window.openProfileModal = function() {
@@ -976,14 +993,14 @@
         const initials = displayName.substring(0, 2).toUpperCase();
 
         authContainer.innerHTML = `
-          <div class="relative" id="profileDropdownWrapper">
+          <div class="relative">
             <button onclick="toggleProfileDropdown(event)" class="px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 transition flex items-center gap-2 cursor-pointer">
               <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-extrabold">${initials}</div>
               <span class="max-w-[100px] sm:max-w-[140px] truncate">${displayName}</span>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
             </button>
 
-            <div id="profileDropdownMenu" class="absolute right-0 top-full mt-1.5 w-52 py-1.5 bg-slate-800 rounded-xl shadow-xl border border-slate-700 hidden z-50">
+            <div id="profileDropdownMenu" class="absolute right-0 top-full mt-1.5 w-52 py-1.5 bg-slate-800 rounded-xl shadow-xl border border-slate-700 hidden z-50 animate-fade-in">
               <div class="px-4 py-2 border-b border-slate-700">
                 <p class="text-xs font-bold text-white truncate">${displayName}</p>
                 <p class="text-[11px] text-slate-400 truncate">${currentUser.email}</p>
@@ -1023,23 +1040,9 @@
       'Miscellaneous': { icon: 'package', color: 'text-slate-300 bg-slate-800', essential: false }
     };
 
-    window.toggleBackupMenu = function(e) {
-      e.stopPropagation();
-      const menu = document.getElementById('backupDropdownMenu');
-      menu.classList.toggle('hidden');
+    window.toggleDarkMode = function() {
+      // Dark mode default placeholder
     };
-
-    window.closeBackupMenu = function() {
-      const menu = document.getElementById('backupDropdownMenu');
-      if (menu) menu.classList.add('hidden');
-    };
-
-    document.addEventListener('click', (e) => {
-      const wrapper = document.getElementById('backupDropdownWrapper');
-      if (wrapper && !wrapper.contains(e.target)) {
-        window.closeBackupMenu();
-      }
-    });
 
     function onCategorySelectChange() {
       const catSelect = document.getElementById('expenseCategory');
@@ -1324,7 +1327,6 @@
       document.getElementById('barEssential').style.width = `${essentialPct}%`;
       document.getElementById('barFlexible').style.width = `${flexiblePct}%`;
 
-      // Render Monthly Budget Progress & Warnings
       const monthlyBudgetCap = Number(userProfile?.monthlyBudget) || 0;
       const budgetCapText = document.getElementById('budgetCapText');
       const budgetProgressBar = document.getElementById('budgetProgressBar');
