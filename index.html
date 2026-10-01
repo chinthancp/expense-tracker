@@ -57,13 +57,13 @@
     }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-full transition-colors duration-200">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-full transition-colors duration-200">
   <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-120%] opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white"></div>
 
   <!-- Authentication Modal -->
   <div id="authModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-800 p-8 space-y-5 relative animate-fade-in">
-      <button onclick="closeAuthModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-200 cursor-pointer">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-5 relative animate-fade-in">
+      <button onclick="closeAuthModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
@@ -71,41 +71,41 @@
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 mx-auto">
           <i data-lucide="wallet-cards" class="w-7 h-7"></i>
         </div>
-        <h2 id="authModalTitle" class="text-2xl font-extrabold text-white">Welcome to SpendWise</h2>
-        <p id="authModalSubtitle" class="text-xs text-slate-400">Sign in to access your secure expense ledger.</p>
+        <h2 id="authModalTitle" class="text-2xl font-extrabold text-slate-900 dark:text-white">Welcome to SpendWise</h2>
+        <p id="authModalSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Sign in to access your secure expense ledger.</p>
       </div>
 
-      <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-950/60 border border-rose-900 text-rose-400 text-xs font-semibold flex items-start gap-2">
+      <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-xs font-semibold flex items-start gap-2">
         <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
         <span id="authErrorText">Error message goes here</span>
       </div>
 
       <div id="googleAuthWrapper">
-        <button type="button" onclick="handleGoogleLogin()" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-slate-200 bg-slate-800 border border-slate-700 hover:bg-slate-700 transition flex items-center justify-center gap-3 shadow-xs cursor-pointer">
+        <button type="button" onclick="handleGoogleLogin()" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center justify-center gap-3 shadow-xs cursor-pointer">
           <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.33 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.18C.43 8.13 0 9.87 0 12s.43 3.87 1.18 5.39l4.09-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.16 2.67 1.18 6.61l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
           Continue with Google
         </button>
 
-        <div class="flex items-center gap-4 text-slate-500 text-xs uppercase tracking-wider font-semibold my-4">
-          <div class="h-px bg-slate-800 flex-1"></div>
+        <div class="flex items-center gap-4 text-slate-400 text-xs uppercase tracking-wider font-semibold my-4">
+          <div class="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
           <span>Or with Email</span>
-          <div class="h-px bg-slate-800 flex-1"></div>
+          <div class="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
         </div>
       </div>
 
       <form id="emailAuthForm" class="space-y-3.5">
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Email Address</label>
-          <input type="email" id="authEmail" required placeholder="you@example.com" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Email Address</label>
+          <input type="email" id="authEmail" required placeholder="you@example.com" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Password</label>
-          <input type="password" id="authPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Password</label>
+          <input type="password" id="authPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         
         <div id="confirmPasswordGroup" class="hidden">
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Confirm Password</label>
-          <input type="password" id="authConfirmPassword" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Confirm Password</label>
+          <input type="password" id="authConfirmPassword" placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
 
         <div class="pt-2">
@@ -115,10 +115,10 @@
         </div>
       </form>
 
-      <div class="text-center pt-2 border-t border-slate-800">
-        <p id="authToggleText" class="text-xs text-slate-400">
+      <div class="text-center pt-2 border-t border-slate-200 dark:border-slate-800">
+        <p id="authToggleText" class="text-xs text-slate-500 dark:text-slate-400">
           Don't have an account? 
-          <button type="button" onclick="toggleAuthMode()" class="text-blue-400 font-bold hover:underline cursor-pointer">Create Account</button>
+          <button type="button" onclick="toggleAuthMode()" class="text-blue-600 dark:text-blue-400 font-bold hover:underline cursor-pointer">Create Account</button>
         </p>
       </div>
     </div>
@@ -126,45 +126,45 @@
 
   <!-- Profile & Settings Modal -->
   <div id="profileModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-800 p-8 space-y-6 relative animate-fade-in">
-      <button onclick="closeProfileModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-200 cursor-pointer">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-6 relative animate-fade-in">
+      <button onclick="closeProfileModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
-        <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
           <i data-lucide="settings" class="w-5 h-5"></i>
         </div>
         <div>
-          <h3 class="font-bold text-lg text-white">Settings & Profile</h3>
-          <p class="text-xs text-slate-400">Manage your profile, budget cap, and account</p>
+          <h3 class="font-bold text-lg text-slate-900 dark:text-white">Settings & Profile</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Manage your profile, budget cap, and account</p>
         </div>
       </div>
 
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Display Name</label>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Display Name</label>
           <div class="flex gap-2">
-            <input type="text" id="profileDisplayNameInput" placeholder="Enter your name" class="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white outline-none">
+            <input type="text" id="profileDisplayNameInput" placeholder="Enter your name" class="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
             <button onclick="saveProfileDisplayName()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition cursor-pointer">Save</button>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Monthly Spending Budget Cap (₹)</label>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Monthly Spending Budget Cap (₹)</label>
           <div class="flex gap-2">
-            <input type="number" id="profileBudgetInput" min="0" step="any" placeholder="e.g. 30000" class="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white outline-none">
+            <input type="number" id="profileBudgetInput" min="0" step="any" placeholder="e.g. 30000" class="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
             <button onclick="saveMonthlyBudget()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition cursor-pointer">Set Cap</button>
           </div>
           <p class="text-[11px] text-slate-400 mt-1">Receive visual warning badges when approaching this cap.</p>
         </div>
 
-        <div class="pt-4 border-t border-slate-800 space-y-3">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-rose-400">Danger Zone</h4>
-          <p class="text-xs text-slate-400">
+        <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Danger Zone</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
             Deleting your account schedules your data for permanent deletion with a <strong>7-day recovery window</strong>.
           </p>
-          <button onclick="requestAccountDeletion()" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-rose-400 bg-rose-950/40 border border-rose-900 hover:bg-rose-900/60 transition cursor-pointer">
+          <button onclick="requestAccountDeletion()" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition cursor-pointer">
             Delete Account Permanently
           </button>
         </div>
@@ -174,19 +174,19 @@
 
   <!-- Account Recovery Modal -->
   <div id="recoveryModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-800 p-8 space-y-5 text-center animate-fade-in">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-5 text-center animate-fade-in">
       <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto">
         <i data-lucide="alert-triangle" class="w-7 h-7"></i>
       </div>
-      <h3 class="text-xl font-extrabold text-white">Account Pending Deletion</h3>
-      <p id="recoveryMessage" class="text-xs text-slate-400">
+      <h3 class="text-xl font-extrabold text-slate-900 dark:text-white">Account Pending Deletion</h3>
+      <p id="recoveryMessage" class="text-xs text-slate-500 dark:text-slate-400">
         Your account was scheduled for deletion. Would you like to restore your account and cancel the deletion?
       </p>
       <div class="flex gap-2 pt-2">
         <button onclick="restoreAccount()" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700 transition cursor-pointer">
           Restore Account
         </button>
-        <button onclick="handleLogout()" class="py-3 px-4 rounded-xl font-bold text-sm text-slate-300 bg-slate-800 hover:bg-slate-700 transition cursor-pointer">
+        <button onclick="handleLogout()" class="py-3 px-4 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">
           Log Out
         </button>
       </div>
@@ -194,13 +194,13 @@
   </div>
 
   <!-- Edit Expense Modal -->
-  <div id="editModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl border border-slate-800 p-6 space-y-4 animate-fade-in">
-      <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+  <div id="editModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 animate-fade-in">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <i data-lucide="edit-3" class="w-5 h-5 text-blue-500"></i> Edit Expense Entry
         </h3>
-        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-200 cursor-pointer">
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -208,27 +208,27 @@
         <input type="hidden" id="editId">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Date</label>
-            <input type="date" id="editDate" required class="w-full px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Date</label>
+            <input type="date" id="editDate" required class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Amount (₹)</label>
-            <input type="number" id="editAmount" step="any" min="0" required class="w-full px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Amount (₹)</label>
+            <input type="number" id="editAmount" step="any" min="0" required class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Title / Description</label>
-          <input type="text" id="editTitle" required class="w-full px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Title / Description</label>
+          <input type="text" id="editTitle" required class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Category</label>
-            <select id="editCategory" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none" onchange="syncEditEssential()">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Category</label>
+            <select id="editCategory" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" onchange="syncEditEssential()">
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Payment Method</label>
-            <select id="editPaymentMethod" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Payment Method</label>
+            <select id="editPaymentMethod" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
               <option value="UPI">UPI</option>
               <option value="Net Banking">Net Banking / Auto-Debit</option>
               <option value="Credit Card">Credit Card</option>
@@ -237,31 +237,31 @@
             </select>
           </div>
         </div>
-        <div class="flex items-center gap-2 p-3 rounded-lg bg-slate-800/60 border border-slate-700">
+        <div class="flex items-center gap-2 p-3 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
           <input type="checkbox" id="editIsEssential" class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500">
           <label for="editIsEssential" class="text-xs sm:text-sm font-medium cursor-pointer">
             Mark as Necessary / Essential Expense (Rent, EMI, Utilities, Transport)
           </label>
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm rounded-lg font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 cursor-pointer">Cancel</button>
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm rounded-lg font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer">Cancel</button>
           <button type="submit" id="editSubmitBtn" class="px-4 py-2 text-sm rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/20 cursor-pointer">Save Changes</button>
         </div>
       </form>
     </div>
   </div>
 
-  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+  <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
           <i data-lucide="wallet-cards" class="w-6 h-6"></i>
         </div>
         <div>
-          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
             SpendWise
           </h1>
-          <p class="text-xs text-slate-400 font-medium flex items-center gap-1.5" id="syncStatus">
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5" id="syncStatus">
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             Cloud Synced
           </p>
@@ -270,29 +270,31 @@
 
       <div class="flex items-center gap-2 sm:gap-3">
         <div class="relative flex items-center">
-          <input type="month" id="selectedMonthInput" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-700 bg-slate-800 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+          <input type="month" id="selectedMonthInput" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
         </div>
 
         <!-- Export/Import Options Dropdown Button -->
         <div class="relative" id="backupDropdownWrapper">
-          <button type="button" id="backupBtn" onclick="toggleBackupMenu(event)" class="p-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer" title="Data Backup">
-            <i data-lucide="database" class="w-4 h-4 text-slate-400"></i>
+          <button type="button" id="backupBtn" onclick="toggleBackupMenu(event)" class="p-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-slate-200" title="Data Backup">
+            <i data-lucide="database" class="w-4 h-4 text-slate-500 dark:text-slate-400"></i>
             <span class="hidden md:inline">Data</span>
             <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
           </button>
           
-          <div id="backupDropdownMenu" class="absolute right-0 top-full mt-1.5 w-48 py-1.5 bg-slate-800 rounded-xl shadow-xl border border-slate-700 hidden z-50 animate-fade-in">
-            <button type="button" onclick="exportToCSV(); closeBackupMenu();" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-700 flex items-center gap-2 text-slate-200 cursor-pointer">
-              <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i> Export to CSV
+          <div id="backupDropdownMenu" class="absolute right-0 top-full mt-1.5 w-48 py-1.5 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 hidden z-50 animate-fade-in">
+            <button type="button" onclick="exportToCSV(); closeBackupMenu();" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-500"></i> Export to CSV
             </button>
-            <button type="button" onclick="exportToJSON(); closeBackupMenu();" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-700 flex items-center gap-2 text-slate-200 cursor-pointer">
-              <i data-lucide="download" class="w-4 h-4 text-blue-400"></i> Export to JSON
+            <button type="button" onclick="exportToJSON(); closeBackupMenu();" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer">
+              <i data-lucide="download" class="w-4 h-4 text-blue-500"></i> Export to JSON
             </button>
           </div>
         </div>
 
-        <button onclick="toggleDarkMode()" class="p-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer" aria-label="Toggle Theme" title="Theme Toggle (Dark Only)">
-          <i data-lucide="moon" class="w-4 h-4"></i>
+        <!-- Light/Dark Mode Toggle Button -->
+        <button onclick="toggleDarkMode()" class="p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer" aria-label="Toggle Theme" title="Toggle Light/Dark Mode">
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+          <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
         </button>
 
         <!-- Dynamic Auth Button / Profile Dropdown -->
@@ -311,10 +313,10 @@
     <section>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
         <div>
-          <h2 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
             <span id="kpiMonthLabel">Overview</span>
           </h2>
-          <p class="text-xs text-slate-400">Total monthly outlays split between committed essentials and flexible spends.</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Total monthly outlays split between committed essentials and flexible spends.</p>
         </div>
         <div id="budgetWarningBadge" class="hidden items-center text-xs px-3 py-1 rounded-full font-semibold border shadow-xs">
           <!-- Budget status indicator -->
@@ -322,97 +324,97 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="relative overflow-hidden bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-sm hover:border-slate-700 transition">
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
             <span>Total Outflow</span>
-            <div class="p-2 rounded-lg bg-blue-950/60 text-blue-400">
+            <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
               <i data-lucide="indian-rupee" class="w-4 h-4"></i>
             </div>
           </div>
           <div class="mt-2 flex items-baseline gap-2">
-            <span id="statTotalAmount" class="text-2xl sm:text-3xl font-extrabold text-white">₹0</span>
+            <span id="statTotalAmount" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">₹0</span>
           </div>
-          <p class="mt-1 text-xs text-slate-400 flex items-center gap-1">
+          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
             <span id="statEntryCount">0</span> entries logged this month
           </p>
           <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
         </div>
 
-        <div class="relative overflow-hidden bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-sm hover:border-slate-700 transition">
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
             <span>Essential / Fixed</span>
-            <div class="p-2 rounded-lg bg-emerald-950/60 text-emerald-400">
+            <div class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
               <i data-lucide="shield-check" class="w-4 h-4"></i>
             </div>
           </div>
           <div class="mt-2 flex items-baseline gap-2">
-            <span id="statEssentialAmount" class="text-2xl sm:text-3xl font-extrabold text-emerald-400">₹0</span>
-            <span id="statEssentialPercent" class="text-xs font-semibold text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded">0%</span>
+            <span id="statEssentialAmount" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">₹0</span>
+            <span id="statEssentialPercent" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.5 rounded">0%</span>
           </div>
-          <p class="mt-1 text-xs text-slate-400 truncate">Rent, EMIs, Utilities & Commute</p>
+          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate">Rent, EMIs, Utilities & Commute</p>
           <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
         </div>
 
-        <div class="relative overflow-hidden bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-sm hover:border-slate-700 transition">
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
             <span>Flexible / Lifestyle</span>
-            <div class="p-2 rounded-lg bg-amber-950/60 text-amber-400">
+            <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
               <i data-lucide="sparkles" class="w-4 h-4"></i>
             </div>
           </div>
           <div class="mt-2 flex items-baseline gap-2">
-            <span id="statFlexibleAmount" class="text-2xl sm:text-3xl font-extrabold text-amber-400">₹0</span>
-            <span id="statFlexiblePercent" class="text-xs font-semibold text-amber-400 bg-amber-950 px-1.5 py-0.5 rounded">0%</span>
+            <span id="statFlexibleAmount" class="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400">₹0</span>
+            <span id="statFlexiblePercent" class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950 px-1.5 py-0.5 rounded">0%</span>
           </div>
-          <p class="mt-1 text-xs text-slate-400 truncate">Dining, Shopping, Leisure & Misc</p>
+          <p class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate">Dining, Shopping, Leisure & Misc</p>
           <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
         </div>
 
-        <div class="relative overflow-hidden bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-sm hover:border-slate-700 transition">
-          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider">
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
             <span>Daily Average Expense</span>
-            <div class="p-2 rounded-lg bg-purple-950/60 text-purple-400">
+            <div class="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400">
               <i data-lucide="calculator" class="w-4 h-4"></i>
             </div>
           </div>
           <div class="mt-2 flex items-baseline gap-2">
-            <span id="statDailyAverage" class="text-2xl sm:text-3xl font-extrabold text-purple-400">₹0</span>
-            <span class="text-xs text-slate-400">/ day</span>
+            <span id="statDailyAverage" class="text-2xl sm:text-3xl font-extrabold text-purple-600 dark:text-purple-400">₹0</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">/ day</span>
           </div>
-          <p id="statActiveDays" class="mt-1 text-xs text-slate-400">Across 0 spending days</p>
+          <p id="statActiveDays" class="mt-1 text-xs text-slate-500 dark:text-slate-400">Across 0 spending days</p>
           <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
         </div>
       </div>
     </section>
 
     <!-- Budget Progress Bar & Commitment Ratio -->
-    <section class="bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-sm space-y-4">
+    <section class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
       <div id="budgetProgressSection">
         <div class="flex justify-between items-center text-xs mb-1.5">
-          <span class="font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <i data-lucide="target" class="w-4 h-4 text-blue-500"></i> Monthly Budget Target: <span id="budgetCapText" class="text-white font-extrabold">Not Set</span>
+          <span class="font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="target" class="w-4 h-4 text-blue-500"></i> Monthly Budget Target: <span id="budgetCapText" class="text-slate-900 dark:text-white font-extrabold">Not Set</span>
           </span>
-          <span id="budgetStatusText" class="font-bold text-slate-400">Set a cap in Settings</span>
+          <span id="budgetStatusText" class="font-bold text-slate-500 dark:text-slate-400">Set a cap in Settings</span>
         </div>
-        <div class="w-full h-3 rounded-full bg-slate-800 flex overflow-hidden">
+        <div class="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 flex overflow-hidden">
           <div id="budgetProgressBar" class="bg-blue-600 h-full transition-all duration-500" style="width: 0%"></div>
         </div>
       </div>
 
-      <div class="pt-3 border-t border-slate-800">
+      <div class="pt-3 border-t border-slate-200 dark:border-slate-800">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Commitment Ratio:</span>
-            <span class="text-sm font-semibold text-emerald-400 flex items-center gap-1">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Commitment Ratio:</span>
+            <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Essential: <span id="barEssentialTxt">0%</span>
             </span>
-            <span class="text-sm font-semibold text-amber-400 flex items-center gap-1 ml-3">
+            <span class="text-sm font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1 ml-3">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> Flexible: <span id="barFlexibleTxt">0%</span>
             </span>
           </div>
-          <span class="text-xs text-slate-400">Ideal rule of thumb: Essentials ≤ 50-60% of total spend</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400">Ideal rule of thumb: Essentials ≤ 50-60% of total spend</span>
         </div>
-        <div class="w-full h-3 rounded-full bg-slate-800 flex overflow-hidden">
+        <div class="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 flex overflow-hidden">
           <div id="barEssential" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
           <div id="barFlexible" class="bg-amber-500 h-full transition-all duration-500" style="width: 0%"></div>
         </div>
@@ -424,40 +426,40 @@
 
       <!-- Left: Form & Category Breakdown -->
       <div class="lg:col-span-5 space-y-6">
-        <div class="bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-sm">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold">
+              <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
                 <i data-lucide="plus-circle" class="w-5 h-5"></i>
               </div>
-              <h3 class="font-bold text-white">Record Expense</h3>
+              <h3 class="font-bold text-slate-900 dark:text-white">Record Expense</h3>
             </div>
             <span class="text-xs text-slate-400 font-medium">Quick Entry</span>
           </div>
 
           <form id="expenseForm" class="space-y-4">
             <div>
-              <label for="expenseDate" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+              <label for="expenseDate" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                 Transaction Date *
               </label>
-              <input type="date" id="expenseDate" required class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+              <input type="date" id="expenseDate" required class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label for="expenseAmount" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                <label for="expenseAmount" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                   Amount (₹) *
                 </label>
                 <div class="relative">
                   <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold">₹</span>
-                  <input type="number" id="expenseAmount" step="any" min="0" required placeholder="0.00" class="w-full pl-8 pr-3 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+                  <input type="number" id="expenseAmount" step="any" min="0" required placeholder="0.00" class="w-full pl-8 pr-3 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
                 </div>
               </div>
               <div>
-                <label for="paymentMethod" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                <label for="paymentMethod" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                   Payment Mode
                 </label>
-                <select id="paymentMethod" class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+                <select id="paymentMethod" class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
                   <option value="UPI">UPI</option>
                   <option value="Net Banking">Net Banking / Auto-Debit</option>
                   <option value="Credit Card">Credit Card</option>
@@ -469,14 +471,14 @@
 
             <div>
               <div class="flex items-center justify-between mb-1">
-                <label for="expenseCategory" class="block text-xs font-bold uppercase tracking-wider text-slate-400">
+                <label for="expenseCategory" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Category *
                 </label>
-                <span id="categoryTypeBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300">
+                <span id="categoryTypeBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
                   Essential
                 </span>
               </div>
-              <select id="expenseCategory" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+              <select id="expenseCategory" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
                 <optgroup label="Essential / Fixed Commitments">
                   <option value="Rent" data-essential="true">🏠 House Rent</option>
                   <option value="EMI" data-essential="true">💳 Loan / Card EMI</option>
@@ -497,20 +499,20 @@
             </div>
 
             <div>
-              <label for="expenseTitle" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+              <label for="expenseTitle" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                 Description / Title *
               </label>
-              <input type="text" id="expenseTitle" required placeholder="e.g. Rent, EMI, Swiggy, Fuel" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
+              <input type="text" id="expenseTitle" required placeholder="e.g. Rent, EMI, Swiggy, Fuel" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
             </div>
 
-            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-slate-700">
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
               <div class="flex items-center gap-2.5">
-                <input type="checkbox" id="isEssentialCheck" class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-600">
+                <input type="checkbox" id="isEssentialCheck" class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-600">
                 <div>
-                  <label for="isEssentialCheck" class="text-xs sm:text-sm font-semibold text-slate-200 cursor-pointer">
+                  <label for="isEssentialCheck" class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 cursor-pointer">
                     Necessary / Essential Expense
                   </label>
-                  <p class="text-[11px] text-slate-400">Classify as non-negotiable living cost (EMI, Rent, etc.)</p>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400">Classify as non-negotiable living cost (EMI, Rent, etc.)</p>
                 </div>
               </div>
             </div>
@@ -521,10 +523,10 @@
           </form>
         </div>
 
-        <div class="bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-sm">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-            <h3 class="font-bold text-white flex items-center gap-2">
-              <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-400"></i> Category Breakdown
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+            <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-500 dark:text-indigo-400"></i> Category Breakdown
             </h3>
             <span class="text-xs text-slate-400" id="catMonthText">This Month</span>
           </div>
@@ -539,39 +541,39 @@
 
       <!-- Right: Daily Logs & Totals -->
       <div class="lg:col-span-7 space-y-4">
-        <div class="bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-sm">
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
             <div>
-              <h3 class="font-bold text-lg text-white flex items-center gap-2">
+              <h3 class="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
                 <i data-lucide="calendar-days" class="w-5 h-5 text-blue-500"></i> Daily Log & Spending History
               </h3>
-              <p class="text-xs text-slate-400">Organized by date with auto-computed daily totals</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Organized by date with auto-computed daily totals</p>
             </div>
 
             <div class="flex items-center gap-2 flex-wrap">
-              <select id="typeFilter" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-200 outline-none">
+              <select id="typeFilter" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none">
                 <option value="all">All Types</option>
                 <option value="essential">Essentials Only</option>
                 <option value="flexible">Flexible Only</option>
               </select>
 
               <div class="relative">
-                <input type="text" id="searchFilter" placeholder="Search description..." class="w-36 sm:w-44 px-3 py-1.5 text-xs rounded-lg border border-slate-700 bg-slate-800 text-slate-200 placeholder-slate-500 outline-none">
+                <input type="text" id="searchFilter" placeholder="Search description..." class="w-36 sm:w-44 px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none">
               </div>
             </div>
           </div>
 
-          <div class="mt-4 p-3 rounded-xl bg-slate-800/40 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="mt-4 p-3 rounded-xl bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="flex items-center gap-2">
               <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
-              <span class="text-xs font-semibold text-slate-300">Single Date Inspector:</span>
-              <input type="date" id="dateFilterInput" class="px-2.5 py-1 text-xs rounded-lg border border-slate-700 bg-slate-800 text-slate-100 outline-none">
-              <button onclick="clearDateInspector()" id="clearDateBtn" class="hidden text-xs text-blue-400 hover:underline cursor-pointer">Reset</button>
+              <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Single Date Inspector:</span>
+              <input type="date" id="dateFilterInput" class="px-2.5 py-1 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none">
+              <button onclick="clearDateInspector()" id="clearDateBtn" class="hidden text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">Reset</button>
             </div>
-            <div id="inspectorDailyTotalBadge" class="hidden sm:flex items-center gap-1.5 text-xs font-bold bg-blue-950 text-blue-300 px-3 py-1 rounded-lg">
+            <div id="inspectorDailyTotalBadge" class="hidden sm:flex items-center gap-1.5 text-xs font-bold bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-lg">
               <span>Date Total:</span>
-              <span id="inspectorTotalValue" class="text-blue-100 font-extrabold">₹0</span>
+              <span id="inspectorTotalValue" class="text-blue-900 dark:text-blue-100 font-extrabold">₹0</span>
             </div>
           </div>
 
@@ -665,11 +667,11 @@
       
       let colorClass = '';
       if (type === 'success') {
-        colorClass = 'bg-slate-800 border border-slate-700 text-emerald-400';
+        colorClass = 'bg-slate-900 dark:bg-slate-800 border border-slate-700 text-emerald-400';
       } else if (type === 'info') {
-        colorClass = 'bg-indigo-900 text-indigo-200';
+        colorClass = 'bg-indigo-600 dark:bg-indigo-900 text-indigo-100';
       } else {
-        colorClass = 'bg-rose-950 border border-rose-900 text-rose-400';
+        colorClass = 'bg-rose-600 dark:bg-rose-950 border border-rose-900 text-white dark:text-rose-400';
       }
       
       toast.className = `fixed top-5 right-5 z-50 transform transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold ${colorClass} translate-y-0 opacity-100`;
@@ -719,7 +721,28 @@
       updateAuthModalUI();
     };
 
-    // --- Dropdown Management (Mutual Exclusivity & Click-Away) ---
+    // --- Dropdown Management & Theme Toggle ---
+    window.toggleDarkMode = function() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('spendwise_theme', 'light');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('spendwise_theme', 'dark');
+      }
+      lucide.createIcons();
+    };
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('spendwise_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
     window.toggleBackupMenu = function(e) {
       e.stopPropagation();
       closeProfileDropdown();
@@ -744,7 +767,6 @@
       if (menu) menu.classList.add('hidden');
     };
 
-    // Close all dropdowns when clicking anywhere outside
     document.addEventListener('click', (e) => {
       window.closeBackupMenu();
       window.closeProfileDropdown();
@@ -778,14 +800,14 @@
         submitBtn.innerText = 'Register Account';
         googleWrapper.classList.add('hidden');
         confirmGroup.classList.remove('hidden');
-        toggleText.innerHTML = `Already have an account? <button type="button" onclick="toggleAuthMode()" class="text-blue-400 font-bold hover:underline cursor-pointer">Sign In</button>`;
+        toggleText.innerHTML = `Already have an account? <button type="button" onclick="toggleAuthMode()" class="text-blue-600 dark:text-blue-400 font-bold hover:underline cursor-pointer">Sign In</button>`;
       } else {
         title.innerText = 'Sign In';
         subtitle.innerText = 'Sign in to access your secure expense ledger.';
         submitBtn.innerText = 'Sign In';
         googleWrapper.classList.remove('hidden');
         confirmGroup.classList.add('hidden');
-        toggleText.innerHTML = `Don't have an account? <button type="button" onclick="toggleAuthMode()" class="text-blue-400 font-bold hover:underline cursor-pointer">Create Account</button>`;
+        toggleText.innerHTML = `Don't have an account? <button type="button" onclick="toggleAuthMode()" class="text-blue-600 dark:text-blue-400 font-bold hover:underline cursor-pointer">Create Account</button>`;
       }
     }
 
@@ -994,22 +1016,22 @@
 
         authContainer.innerHTML = `
           <div class="relative">
-            <button onclick="toggleProfileDropdown(event)" class="px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 transition flex items-center gap-2 cursor-pointer">
+            <button onclick="toggleProfileDropdown(event)" class="px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-2 cursor-pointer">
               <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-extrabold">${initials}</div>
               <span class="max-w-[100px] sm:max-w-[140px] truncate">${displayName}</span>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
             </button>
 
-            <div id="profileDropdownMenu" class="absolute right-0 top-full mt-1.5 w-52 py-1.5 bg-slate-800 rounded-xl shadow-xl border border-slate-700 hidden z-50 animate-fade-in">
-              <div class="px-4 py-2 border-b border-slate-700">
-                <p class="text-xs font-bold text-white truncate">${displayName}</p>
-                <p class="text-[11px] text-slate-400 truncate">${currentUser.email}</p>
+            <div id="profileDropdownMenu" class="absolute right-0 top-full mt-1.5 w-52 py-1.5 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 hidden z-50 animate-fade-in">
+              <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
+                <p class="text-xs font-bold text-slate-900 dark:text-white truncate">${displayName}</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">${currentUser.email}</p>
               </div>
-              <button type="button" onclick="openProfileModal()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-700 flex items-center gap-2 text-slate-200 cursor-pointer">
-                <i data-lucide="settings" class="w-4 h-4 text-blue-400"></i> Settings & Budget
+              <button type="button" onclick="openProfileModal()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 cursor-pointer">
+                <i data-lucide="settings" class="w-4 h-4 text-blue-500 dark:text-blue-400"></i> Settings & Budget
               </button>
-              <div class="h-px bg-slate-700 my-1"></div>
-              <button type="button" onclick="handleLogout()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-700 flex items-center gap-2 text-rose-400 cursor-pointer">
+              <div class="h-px bg-slate-100 dark:bg-slate-700 my-1"></div>
+              <button type="button" onclick="handleLogout()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-rose-600 dark:text-rose-400 cursor-pointer">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Logout
               </button>
             </div>
@@ -1026,22 +1048,18 @@
     }
 
     const CATEGORY_MAP = {
-      'Rent': { icon: 'home', color: 'text-blue-400 bg-blue-950/70', essential: true },
-      'EMI': { icon: 'credit-card', color: 'text-rose-400 bg-rose-950/70', essential: true },
-      'Utilities & Bills': { icon: 'zap', color: 'text-amber-400 bg-amber-950/70', essential: true },
-      'Transport & Fuel': { icon: 'car', color: 'text-cyan-400 bg-cyan-950/70', essential: true },
-      'Groceries & Essentials': { icon: 'shopping-cart', color: 'text-emerald-400 bg-emerald-950/70', essential: true },
-      'Healthcare & Medicines': { icon: 'heart-pulse', color: 'text-red-400 bg-red-950/70', essential: true },
-      'Dining & Takeout': { icon: 'utensils', color: 'text-orange-400 bg-orange-950/70', essential: false },
-      'Shopping & Tech': { icon: 'shopping-bag', color: 'text-purple-400 bg-purple-950/70', essential: false },
-      'Entertainment & OTT': { icon: 'tv', color: 'text-indigo-400 bg-indigo-950/70', essential: false },
-      'Personal Care': { icon: 'sparkle', color: 'text-pink-400 bg-pink-950/70', essential: false },
-      'Travel & Leisure': { icon: 'plane', color: 'text-teal-400 bg-teal-950/70', essential: false },
-      'Miscellaneous': { icon: 'package', color: 'text-slate-300 bg-slate-800', essential: false }
-    };
-
-    window.toggleDarkMode = function() {
-      // Dark mode default placeholder
+      'Rent': { icon: 'home', color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/70', essential: true },
+      'EMI': { icon: 'credit-card', color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/70', essential: true },
+      'Utilities & Bills': { icon: 'zap', color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/70', essential: true },
+      'Transport & Fuel': { icon: 'car', color: 'text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/70', essential: true },
+      'Groceries & Essentials': { icon: 'shopping-cart', color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/70', essential: true },
+      'Healthcare & Medicines': { icon: 'heart-pulse', color: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/70', essential: true },
+      'Dining & Takeout': { icon: 'utensils', color: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/70', essential: false },
+      'Shopping & Tech': { icon: 'shopping-bag', color: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/70', essential: false },
+      'Entertainment & OTT': { icon: 'tv', color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70', essential: false },
+      'Personal Care': { icon: 'sparkle', color: 'text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-950/70', essential: false },
+      'Travel & Leisure': { icon: 'plane', color: 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/70', essential: false },
+      'Miscellaneous': { icon: 'package', color: 'text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800', essential: false }
     };
 
     function onCategorySelectChange() {
@@ -1054,10 +1072,10 @@
       check.checked = isEssential;
       if (isEssential) {
         badge.textContent = 'Essential';
-        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300';
       } else {
         badge.textContent = 'Flexible';
-        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-950 text-amber-300';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300';
       }
     }
     document.getElementById('expenseCategory').addEventListener('change', onCategorySelectChange);
@@ -1340,14 +1358,14 @@
 
         if (totalMonthSpent > monthlyBudgetCap) {
           budgetProgressBar.className = "bg-rose-600 h-full transition-all duration-500";
-          budgetStatusText.innerHTML = `<span class="text-rose-400">Budget exceeded by ${formatINR(totalMonthSpent - monthlyBudgetCap)}!</span>`;
-          warningBadge.className = "inline-flex items-center text-xs px-3 py-1 rounded-full font-semibold bg-rose-950 text-rose-300 border border-rose-900 shadow-xs";
+          budgetStatusText.innerHTML = `<span class="text-rose-600 dark:text-rose-400">Budget exceeded by ${formatINR(totalMonthSpent - monthlyBudgetCap)}!</span>`;
+          warningBadge.className = "inline-flex items-center text-xs px-3 py-1 rounded-full font-semibold bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 shadow-xs";
           warningBadge.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5 mr-1 inline"></i> Over Budget (${budgetPct}%)`;
           warningBadge.classList.remove('hidden');
         } else if (budgetPct >= 80) {
           budgetProgressBar.className = "bg-amber-500 h-full transition-all duration-500";
-          budgetStatusText.innerHTML = `<span class="text-amber-400">${budgetPct}% of monthly budget used</span>`;
-          warningBadge.className = "inline-flex items-center text-xs px-3 py-1 rounded-full font-semibold bg-amber-950 text-amber-300 border border-amber-900 shadow-xs";
+          budgetStatusText.innerHTML = `<span class="text-amber-600 dark:text-amber-400">${budgetPct}% of monthly budget used</span>`;
+          warningBadge.className = "inline-flex items-center text-xs px-3 py-1 rounded-full font-semibold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900 shadow-xs";
           warningBadge.innerHTML = `<i data-lucide="alert-triangle" class="w-3.5 h-3.5 mr-1 inline"></i> Near Budget Limit (${budgetPct}%)`;
           warningBadge.classList.remove('hidden');
         } else {
@@ -1408,7 +1426,7 @@
 
       if (sortedCategories.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-8 text-slate-500">
+          <div class="text-center py-8 text-slate-400">
             <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
             <p class="text-xs">No transactions recorded for this month</p>
           </div>
@@ -1460,7 +1478,7 @@
       sortedCategories.forEach(cat => {
         const amt = aggregates[cat];
         const pct = total > 0 ? Math.round((amt / total) * 100) : 0;
-        const config = CATEGORY_MAP[cat] || { icon: 'tag', color: 'text-slate-400 bg-slate-800', essential: false };
+        const config = CATEGORY_MAP[cat] || { icon: 'tag', color: 'text-slate-500 bg-slate-100 dark:bg-slate-800', essential: false };
 
         html += `
           <div class="space-y-1">
@@ -1469,15 +1487,15 @@
                 <span class="p-1 rounded-md ${config.color}">
                   <i data-lucide="${config.icon}" class="w-3.5 h-3.5"></i>
                 </span>
-                <span class="font-semibold text-slate-200">${cat}</span>
-                ${config.essential ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 font-bold">Fixed</span>' : ''}
+                <span class="font-semibold text-slate-800 dark:text-slate-200">${cat}</span>
+                ${config.essential ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold">Fixed</span>' : ''}
               </div>
               <div class="text-right">
-                <span class="font-bold text-white">${formatINR(amt)}</span>
-                <span class="text-slate-500 text-[11px] ml-1">(${pct}%)</span>
+                <span class="font-bold text-slate-900 dark:text-white">${formatINR(amt)}</span>
+                <span class="text-slate-400 text-[11px] ml-1">(${pct}%)</span>
               </div>
             </div>
-            <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+            <div class="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
               <div class="h-full rounded-full" style="width: ${pct}%; background-color: ${colorMap[cat] || '#3b82f6'};"></div>
             </div>
           </div>
@@ -1491,11 +1509,11 @@
 
       if (!currentUser) {
         container.innerHTML = `
-          <div class="text-center py-12 px-4 rounded-xl border border-dashed border-slate-800">
-            <div class="w-12 h-12 rounded-full bg-blue-950/60 flex items-center justify-center mx-auto mb-3 text-blue-400">
+          <div class="text-center py-12 px-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+            <div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center mx-auto mb-3 text-blue-600 dark:text-blue-400">
               <i data-lucide="lock" class="w-6 h-6"></i>
             </div>
-            <h4 class="text-sm font-bold text-slate-200">Sign in to view your secure ledger</h4>
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300">Sign in to view your secure ledger</h4>
             <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto mb-4">
               Your expenses are completely private and tied to your individual Google or email account.
             </p>
@@ -1509,11 +1527,11 @@
 
       if (items.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-12 px-4 rounded-xl border border-dashed border-slate-800">
-            <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-500">
+          <div class="text-center py-12 px-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+            <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-400">
               <i data-lucide="receipt" class="w-6 h-6"></i>
             </div>
-            <h4 class="text-sm font-bold text-slate-300">No expense entries found</h4>
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300">No expense entries found</h4>
             <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
               Add your bills, rent, or daily purchases using the form on the left to start tracking your daily and monthly outflows.
             </p>
@@ -1541,43 +1559,43 @@
         const isToday = date === todayStr;
 
         fullHTML += `
-          <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-sm">
-            <div class="px-4 py-3 bg-slate-800/80 border-b border-slate-800 flex items-center justify-between gap-3">
+          <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 overflow-hidden shadow-sm">
+            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
               <div class="flex items-center gap-2">
-                <i data-lucide="calendar" class="w-4 h-4 text-blue-400"></i>
-                <span class="font-bold text-sm text-white">${readableDate}</span>
+                <i data-lucide="calendar" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
+                <span class="font-bold text-sm text-slate-900 dark:text-white">${readableDate}</span>
                 ${isToday ? '<span class="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full bg-blue-600 text-white">Today</span>' : ''}
               </div>
-              <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1 rounded-lg border border-slate-700 shadow-xs">
-                <span class="text-xs font-semibold text-slate-400">Total Spent:</span>
-                <span class="text-xs sm:text-sm font-extrabold text-white">${formatINR(dailyTotal)}</span>
+              <div class="flex items-center gap-1.5 bg-white dark:bg-slate-900 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs">
+                <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Spent:</span>
+                <span class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">${formatINR(dailyTotal)}</span>
               </div>
             </div>
 
-            <div class="divide-y divide-slate-800/60">
+            <div class="divide-y divide-slate-100 dark:divide-slate-800/60">
         `;
 
         dayItems.forEach(item => {
-          const config = CATEGORY_MAP[item.category] || { icon: 'tag', color: 'text-slate-400 bg-slate-800', essential: false };
+          const config = CATEGORY_MAP[item.category] || { icon: 'tag', color: 'text-slate-500 bg-slate-100 dark:bg-slate-800', essential: false };
           
           fullHTML += `
-            <div class="p-3.5 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-800/30 transition-colors group">
+            <div class="p-3.5 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
               <div class="flex items-center gap-3 min-w-0">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${config.color}">
                   <i data-lucide="${config.icon}" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-sm font-bold text-white truncate">${escapeHtml(item.title)}</span>
+                    <span class="text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(item.title)}</span>
                     ${item.isEssential ? 
-                      '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300">Essential</span>' : 
-                      '<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">Flexible</span>'
+                      '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">Essential</span>' : 
+                      '<span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Flexible</span>'
                     }
                   </div>
                   <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
                     <span>${item.category}</span>
                     <span>•</span>
-                    <span class="flex items-center gap-1 font-medium text-slate-400">
+                    <span class="flex items-center gap-1 font-medium text-slate-500 dark:text-slate-400">
                       <i data-lucide="credit-card" class="w-3 h-3"></i> ${item.paymentMethod || 'UPI'}
                     </span>
                   </div>
@@ -1586,13 +1604,13 @@
 
               <div class="flex items-center gap-3 shrink-0">
                 <div class="text-right">
-                  <span class="text-base sm:text-lg font-bold text-white tracking-tight">${formatINR(item.amount)}</span>
+                  <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">${formatINR(item.amount)}</span>
                 </div>
                 <div class="flex items-center gap-1">
-                  <button onclick="openEditModal('${item.id}')" class="p-1.5 text-slate-400 hover:text-blue-400 rounded-lg hover:bg-slate-800 transition cursor-pointer" title="Edit">
+                  <button onclick="openEditModal('${item.id}')" class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer" title="Edit">
                     <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                   </button>
-                  <button onclick="deleteExpense('${item.id}')" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition cursor-pointer" title="Delete">
+                  <button onclick="deleteExpense('${item.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer" title="Delete">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                   </button>
                 </div>
@@ -1626,6 +1644,7 @@
       });
     }
 
+    initTheme();
     const today = new Date();
     const yr = today.getFullYear();
     const mo = String(today.getMonth() + 1).padStart(2, '0');
