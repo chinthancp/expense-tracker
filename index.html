@@ -1007,7 +1007,6 @@
         const dailyTotal = dayItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
         const readableDate = formatDisplayDate(date);
         
-        // Local timezone calculation for "Today" pill
         const localNow = new Date();
         const todayStr = localNow.getFullYear() + '-' + String(localNow.getMonth() + 1).padStart(2, '0') + '-' + String(localNow.getDate()).padStart(2, '0');
         const isToday = date === todayStr;
@@ -1088,6 +1087,15 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+    }
+
+    // Register Service Worker for true offline capability
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker registered successfully:', reg.scope))
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
     }
 
     // Startup initialization
