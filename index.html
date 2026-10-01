@@ -55,15 +55,19 @@
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-full transition-colors duration-200">
   <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-120%] opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"></div>
 
-  <!-- Authentication Gate Modal (Shown if user is logged out) -->
-  <div id="authModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-6">
+  <!-- Authentication Modal (Opened via Top Header Button) -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-6 relative">
+      <button onclick="closeAuthModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
       <div class="text-center space-y-2">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 mx-auto">
           <i data-lucide="wallet-cards" class="w-7 h-7"></i>
         </div>
-        <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">Welcome to SpendWise</h2>
-        <p class="text-xs text-slate-500 dark:text-slate-400">Sign in or create an account to keep your expense ledger secure and private.</p>
+        <h2 id="authModalTitle" class="text-2xl font-extrabold text-slate-900 dark:text-white">Account Access</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Sign in to load your personal ledger or create a new account.</p>
       </div>
 
       <!-- Google Sign-In Button -->
@@ -90,7 +94,7 @@
         </div>
         
         <div class="flex gap-2 pt-2">
-          <button type="submit" onclick="isSignUpMode = false;" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 transition shadow-md shadow-blue-500/20 cursor-pointer">
+          <button type="submit" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 transition shadow-md shadow-blue-500/20 cursor-pointer">
             Sign In
           </button>
           <button type="button" onclick="handleEmailSignUp()" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition border border-blue-200 dark:border-blue-800/80 cursor-pointer">
@@ -204,10 +208,12 @@
           <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
         </button>
 
-        <!-- Logout Button -->
-        <button onclick="handleLogout()" class="p-2 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition cursor-pointer" title="Log Out">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-        </button>
+        <!-- Dynamic Auth Button (Sign In / User Profile) -->
+        <div id="authContainer">
+          <button onclick="openAuthModal()" id="loginNavBtn" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="user" class="w-4 h-4"></i> Sign In
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -575,11 +581,24 @@
       }, 3000);
     };
 
+    // --- Modal Controls ---
+    window.openAuthModal = function() {
+      document.getElementById('authModal').classList.remove('hidden');
+      document.getElementById('authModal').classList.add('flex');
+      lucide.createIcons();
+    };
+
+    window.closeAuthModal = function() {
+      document.getElementById('authModal').classList.add('hidden');
+      document.getElementById('authModal').classList.remove('flex');
+    };
+
     // --- Authentication Handlers ---
     window.handleGoogleLogin = async function() {
       const provider = new GoogleAuthProvider();
       try {
         await signInWithPopup(auth, provider);
+        closeAuthModal();
         window.showToast('Signed in with Google successfully!');
       } catch (err) {
         window.showToast(err.message, 'error');
@@ -593,6 +612,7 @@
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
+        closeAuthModal();
         window.showToast('Signed in successfully!');
       } catch (err) {
         window.showToast(err.message, 'error');
@@ -611,6 +631,7 @@
       try {
         const userCred = await createUserWithEmailAndPassword(auth, email, password);
         await sendEmailVerification(userCred.user);
+        closeAuthModal();
         window.showToast('Account created! Verification email sent.', 'info');
       } catch (err) {
         window.showToast(err.message, 'error');
@@ -631,16 +652,22 @@
     // --- Auth State Observer ---
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
-      const modal = document.getElementById('authModal');
+      const authContainer = document.getElementById('authContainer');
 
       if (user) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+        // Render User Profile Badge & Logout Button in Header
+        authContainer.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="hidden md:inline text-xs font-semibold text-slate-600 dark:text-slate-300 truncate max-w-[140px]">${user.email || 'User'}</span>
+            <button onclick="handleLogout()" class="px-3 py-1.5 text-xs font-bold rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition flex items-center gap-1.5 cursor-pointer" title="Log Out">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Logout
+            </button>
+          </div>
+        `;
 
         // Bind user-specific Firestore collection path: /users/{uid}/expenses
         expensesCol = collection(db, "users", user.uid, "expenses");
         
-        // Listen to user's private expenses
         if (unsubscribeExpenses) unsubscribeExpenses();
         unsubscribeExpenses = onSnapshot(expensesCol, (snapshot) => {
           expenses = [];
@@ -653,12 +680,18 @@
         });
 
       } else {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        // Render Sign In Button in Header
+        authContainer.innerHTML = `
+          <button onclick="openAuthModal()" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="user" class="w-4 h-4"></i> Sign In
+          </button>
+        `;
+
         if (unsubscribeExpenses) unsubscribeExpenses();
         expenses = [];
         renderApp();
       }
+      lucide.createIcons();
     });
 
     // --- App Logic & Event Listeners ---
@@ -783,8 +816,13 @@
     };
 
     window.deleteExpense = async function(id) {
+      if (!currentUser) {
+        window.showToast('Please sign in to delete entries', 'error');
+        openAuthModal();
+        return;
+      }
       const target = expenses.find(x => x.id === id);
-      if (!target || !currentUser) return;
+      if (!target) return;
       if (confirm(`Delete "${target.title}"?`)) {
         try {
           await deleteDoc(doc(db, "users", currentUser.uid, "expenses", id));
@@ -844,7 +882,11 @@
     // Add Expense Handler
     document.getElementById('expenseForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!currentUser) return;
+      if (!currentUser) {
+        window.showToast('Please sign in first to record expenses', 'error');
+        openAuthModal();
+        return;
+      }
 
       const date = document.getElementById('expenseDate').value;
       const amount = parseFloat(document.getElementById('expenseAmount').value);
@@ -1118,6 +1160,24 @@
 
     function renderGroupedLogs(items) {
       const container = document.getElementById('logsContainer');
+
+      if (!currentUser) {
+        container.innerHTML = `
+          <div class="text-center py-12 px-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+            <div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center mx-auto mb-3 text-blue-500">
+              <i data-lucide="lock" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300">Sign in to view your secure ledger</h4>
+            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto mb-4">
+              Your expenses are completely private and tied to your individual Google or email account.
+            </p>
+            <button onclick="openAuthModal()" class="px-4 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition cursor-pointer inline-flex items-center gap-1.5">
+              <i data-lucide="user" class="w-3.5 h-3.5"></i> Sign In Now
+            </button>
+          </div>
+        `;
+        return;
+      }
 
       if (items.length === 0) {
         container.innerHTML = `
