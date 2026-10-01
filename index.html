@@ -251,31 +251,33 @@
     </div>
   </div>
 
-  <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
-          <i data-lucide="wallet-cards" class="w-6 h-6"></i>
+  <header class="sticky top-0 z-40 bg-white/9اتر dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+      <!-- Logo & Sync Status -->
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20 shrink-0">
+          <i data-lucide="wallet-cards" class="w-5 h-5"></i>
         </div>
-        <div>
-          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-lg font-extrabold tracking-tight truncate bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
             SpendWise
           </h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5" id="syncStatus">
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Cloud Synced
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 truncate" id="syncStatus">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span class="truncate">Cloud Synced</span>
           </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Right Header Actions (Optimized for Mobile Wrapping & Visibility) -->
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
         <div class="relative flex items-center">
-          <input type="month" id="selectedMonthInput" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+          <input type="month" id="selectedMonthInput" class="px-2.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
         </div>
 
         <!-- Export/Import Options Dropdown Button -->
         <div class="relative" id="backupDropdownWrapper">
-          <button type="button" id="backupBtn" onclick="toggleBackupMenu(event)" class="p-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-slate-200" title="Data Backup">
+          <button type="button" id="backupBtn" onclick="toggleBackupMenu(event)" class="p-2 sm:px-3 sm:py-1.5 text-xs font-medium rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center gap-1 cursor-pointer text-slate-700 dark:text-slate-200" title="Data Backup">
             <i data-lucide="database" class="w-4 h-4 text-slate-500 dark:text-slate-400"></i>
             <span class="hidden md:inline">Data</span>
             <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
@@ -299,8 +301,8 @@
 
         <!-- Dynamic Auth Button / Profile Dropdown -->
         <div id="authContainer">
-          <button onclick="openAuthModal()" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="user" class="w-4 h-4"></i> Sign In
+          <button onclick="openAuthModal()" class="px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1 cursor-pointer">
+            <i data-lucide="user" class="w-4 h-4"></i> <span class="hidden sm:inline">Sign In</span>
           </button>
         </div>
       </div>
@@ -721,7 +723,6 @@
       updateAuthModalUI();
     };
 
-    // --- Dropdown Management & Theme Toggle ---
     window.toggleDarkMode = function() {
       const html = document.documentElement;
       if (html.classList.contains('dark')) {
@@ -995,6 +996,7 @@
           renderApp();
         }, (error) => {
           console.error("Firestore sync error:", error);
+          document.getElementById('syncStatus').innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0"></span><span class="truncate">Sync Error (Check Rules)</span>`;
         });
 
       } else {
@@ -1003,6 +1005,7 @@
         if (unsubscribeExpenses) unsubscribeExpenses();
         expenses = [];
         renderApp();
+        document.getElementById('syncStatus').innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0"></span><span class="truncate">Signed Out</span>`;
       }
       lucide.createIcons();
     });
@@ -1016,10 +1019,10 @@
 
         authContainer.innerHTML = `
           <div class="relative">
-            <button onclick="toggleProfileDropdown(event)" class="px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-2 cursor-pointer">
-              <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-extrabold">${initials}</div>
-              <span class="max-w-[100px] sm:max-w-[140px] truncate">${displayName}</span>
-              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+            <button onclick="toggleProfileDropdown(event)" class="px-2 sm:px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-1.5 cursor-pointer">
+              <div class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] font-extrabold shrink-0">${initials}</div>
+              <span class="max-w-[70px] sm:max-w-[120px] truncate">${displayName}</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0"></i>
             </button>
 
             <div id="profileDropdownMenu" class="absolute right-0 top-full mt-1.5 w-52 py-1.5 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 hidden z-50 animate-fade-in">
@@ -1039,8 +1042,8 @@
         `;
       } else {
         authContainer.innerHTML = `
-          <button onclick="openAuthModal()" class="px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="user" class="w-4 h-4"></i> Sign In
+          <button onclick="openAuthModal()" class="px-3 py-1.5 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm flex items-center gap-1 cursor-pointer">
+            <i data-lucide="user" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Sign In</span>
           </button>
         `;
       }
