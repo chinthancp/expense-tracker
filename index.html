@@ -135,7 +135,7 @@
           <input type="month" id="selectedMonthInput" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
         </div>
 
-        <!-- Updated Export/Import Options Dropdown Button -->
+        <!-- Export/Import Options Dropdown Button -->
         <div class="relative" id="backupDropdownWrapper">
           <button type="button" id="backupBtn" onclick="toggleBackupMenu(event)" class="p-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition flex items-center gap-1.5 cursor-pointer" title="Data Backup">
             <i data-lucide="database" class="w-4 h-4 text-slate-500 dark:text-slate-400"></i>
@@ -475,7 +475,8 @@
 
     let expenses = [];
     let currentSelectedMonth = '';
-    let categoryChartInstance = null; // Track Chart.js instance
+    let categoryChartInstance = null;
+    window.toastTimeout = null;
 
     function formatINR(val) {
       const num = Number(val) || 0;
@@ -497,20 +498,30 @@
       });
     }
 
-    function showToast(message, type = 'success') {
+    window.showToast = function(message, type = 'success') {
       const toast = document.getElementById('toast');
       toast.innerText = message;
+      
+      let colorClass = '';
       if (type === 'success') {
-        toast.className = 'fixed top-5 right-5 z-50 transform translate-y-0 opacity-100 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white bg-slate-900 dark:bg-blue-600 border border-slate-700';
+        colorClass = 'bg-slate-900 dark:bg-emerald-600 border border-slate-700 dark:border-emerald-500';
       } else if (type === 'info') {
-        toast.className = 'fixed top-5 right-5 z-50 transform translate-y-0 opacity-100 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white bg-indigo-600';
+        colorClass = 'bg-indigo-600';
       } else {
-        toast.className = 'fixed top-5 right-5 z-50 transform translate-y-0 opacity-100 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white bg-rose-600';
+        colorClass = 'bg-rose-600';
       }
-      setTimeout(() => {
+      
+      toast.className = `fixed top-5 right-5 z-50 transform transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-semibold text-white ${colorClass} translate-y-0 opacity-100`;
+
+      if (window.toastTimeout) {
+        clearTimeout(window.toastTimeout);
+      }
+      
+      window.toastTimeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-[-120%]', 'opacity-0');
-      }, 2600);
-    }
+      }, 2500);
+    };
 
     window.toggleDarkMode = function() {
       const html = document.documentElement;
@@ -616,9 +627,9 @@
       if (confirm(`Delete "${target.title}"?`)) {
         try {
           await deleteDoc(doc(db, "expenses", id));
-          showToast(`Removed "${target.title}"`, 'info');
+          window.showToast(`Removed "${target.title}"`, 'info');
         } catch (e) {
-          showToast(e.message, 'error');
+          window.showToast(e.message, 'error');
         }
       }
     };
@@ -630,7 +641,7 @@
 
     window.exportToCSV = function() {
       if (expenses.length === 0) {
-        showToast('No expenses to export', 'error');
+        window.showToast('No expenses to export', 'error');
         return;
       }
       const headers = ['ID', 'Date', 'Title', 'Category', 'Amount_INR', 'Payment_Method', 'Is_Essential'];
@@ -651,12 +662,12 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('Exported CSV successfully');
+      window.showToast('Exported CSV successfully');
     };
 
     window.exportToJSON = function() {
       if (expenses.length === 0) {
-        showToast('No data to export', 'error');
+        window.showToast('No data to export', 'error');
         return;
       }
       const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(expenses, null, 2));
@@ -666,7 +677,7 @@
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
-      showToast('Backup JSON downloaded');
+      window.showToast('Backup JSON downloaded');
     };
 
     // Real-time Cloud Firestore Listener
@@ -699,7 +710,7 @@
       const isEssential = document.getElementById('isEssentialCheck').checked;
 
       if (!date || isNaN(amount) || amount <= 0 || !title) {
-        showToast('Please fill all required fields correctly', 'error');
+        window.showToast('Please fill all required fields correctly', 'error');
         return;
       }
 
@@ -727,9 +738,9 @@
 
         document.getElementById('expenseAmount').value = '';
         document.getElementById('expenseTitle').value = '';
-        showToast(`Saved ₹${amount.toLocaleString('en-IN')} for ${title}`);
+        window.showToast(`Saved ₹${amount.toLocaleString('en-IN')} for ${title}`);
       } catch (err) {
-        showToast(err.message, 'error');
+        window.showToast(err.message, 'error');
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="plus" class="w-4 h-4"></i> Add Expense Entry`;
@@ -749,7 +760,7 @@
       const isEssential = document.getElementById('editIsEssential').checked;
 
       if (!id || !date || isNaN(amount) || amount <= 0 || !title) {
-        showToast('Invalid field values', 'error');
+        window.showToast('Invalid field values', 'error');
         return;
       }
 
@@ -767,9 +778,9 @@
           isEssential
         });
         closeEditModal();
-        showToast('Updated successfully');
+        window.showToast('Updated successfully');
       } catch (err) {
-        showToast(err.message, 'error');
+        window.showToast(err.message, 'error');
       } finally {
         btn.disabled = false;
         btn.innerText = 'Save Changes';
