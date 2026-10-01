@@ -686,16 +686,32 @@
       window.showToast('Backup JSON downloaded');
     };
 
+    // Dynamic Network & Sync Status Manager
+    function updateNetworkStatus() {
+      const statusEl = document.getElementById("syncStatus");
+      if (!navigator.onLine) {
+        statusEl.innerHTML = `
+          <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+          Offline (Cached)
+        `;
+      } else {
+        statusEl.innerHTML = `
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          Cloud Synced
+        `;
+      }
+    }
+
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+
     // Real-time Cloud Firestore Listener with Local Caching
     onSnapshot(expensesCol, (snapshot) => {
       expenses = [];
       snapshot.forEach((docSnap) => {
         expenses.push({ id: docSnap.id, ...docSnap.data() });
       });
-      document.getElementById("syncStatus").innerHTML = `
-        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        Cloud Synced
-      `;
+      updateNetworkStatus();
       renderApp();
     }, (error) => {
       console.error("Firestore sync error:", error);
@@ -1100,6 +1116,7 @@
 
     // Startup initialization
     initTheme();
+    updateNetworkStatus();
     const today = new Date();
     const yr = today.getFullYear();
     const mo = String(today.getMonth() + 1).padStart(2, '0');
