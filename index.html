@@ -132,17 +132,19 @@
           <input type="month" id="selectedMonthInput" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
         </div>
 
-        <div class="relative group">
-          <button id="backupBtn" class="p-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition flex items-center gap-1.5" title="Data Backup">
+        <!-- Export/Import Options Dropdown Button -->
+        <div class="relative" id="backupDropdownWrapper">
+          <button type="button" id="backupBtn" onclick="toggleBackupMenu(event)" class="p-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition flex items-center gap-1.5 cursor-pointer" title="Data Backup">
             <i data-lucide="database" class="w-4 h-4 text-slate-500 dark:text-slate-400"></i>
             <span class="hidden md:inline">Data</span>
             <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
           </button>
-          <div class="absolute right-0 mt-1 w-48 py-1.5 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 hidden group-hover:block z-50">
-            <button onclick="exportToCSV()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+          
+          <div id="backupDropdownMenu" class="absolute right-0 top-full mt-1.5 w-48 py-1.5 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 hidden z-50">
+            <button type="button" onclick="exportToCSV(); closeBackupMenu();" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200">
               <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-500"></i> Export to CSV
             </button>
-            <button onclick="exportToJSON()" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+            <button type="button" onclick="exportToJSON(); closeBackupMenu();" class="w-full text-left px-3 py-2 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200">
               <i data-lucide="download" class="w-4 h-4 text-blue-500"></i> Export to JSON
             </button>
           </div>
@@ -499,6 +501,26 @@
         toast.classList.add('translate-y-[-120%]', 'opacity-0');
       }, 2600);
     }
+
+    // --- Dropdown Toggle Fix ---
+    window.toggleBackupMenu = function(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('backupDropdownMenu');
+      menu.classList.toggle('hidden');
+    };
+
+    window.closeBackupMenu = function() {
+      const menu = document.getElementById('backupDropdownMenu');
+      if (menu) menu.classList.add('hidden');
+    };
+
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('backupDropdownWrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        window.closeBackupMenu();
+      }
+    });
+    // ---------------------------
 
     window.toggleDarkMode = function() {
       const html = document.documentElement;
