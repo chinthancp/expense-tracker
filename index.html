@@ -329,7 +329,7 @@
                 </optgroup>
                 <optgroup label="Discretionary / Flexible Outflows">
                   <option value="Dining & Takeout" data-essential="false">🍔 Dining Out & Food Delivery</option>
-                  <option value="Shopping & Tech" data-essential="false">🛍️️ Shopping & Gadgets</option>
+                  <option value="Shopping & Tech" data-essential="false">🛍️ Shopping & Gadgets</option>
                   <option value="Entertainment & OTT" data-essential="false">🎬 Entertainment & Subscriptions</option>
                   <option value="Personal Care" data-essential="false">💇 Personal Care & Grooming</option>
                   <option value="Travel & Leisure" data-essential="false">✈️ Travel & Leisure</option>
@@ -698,7 +698,7 @@
       window.showToast('Backup JSON downloaded');
     };
 
-    // Robust Real-time Network & Sync Status Manager
+    // Independent Network & Sync Status Manager (Strictly tied to browser state)
     function updateNetworkStatus() {
       const statusEl = document.getElementById("syncStatus");
       if (!navigator.onLine) {
@@ -723,14 +723,9 @@
       snapshot.forEach((docSnap) => {
         expenses.push({ id: docSnap.id, ...docSnap.data() });
       });
-      updateNetworkStatus();
       renderApp();
     }, (error) => {
       console.error("Firestore sync error:", error);
-      document.getElementById("syncStatus").innerHTML = `
-        <span class="inline-block w-2 h-2 rounded-full bg-rose-500"></span>
-        Sync Error (Check Rules)
-      `;
     });
 
     // Add Expense Handler (Non-blocking offline write queue)
