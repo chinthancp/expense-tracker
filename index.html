@@ -32,11 +32,14 @@
       }
     }
   </script>
-  <!-- Google Fonts & Lucide Icons -->
+  
+  <!-- Google Fonts, Lucide Icons, and Chart.js -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -88,7 +91,7 @@
           <div>
             <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Payment Method</label>
             <select id="editPaymentMethod" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
+              <option value="UPI">UPI</option>
               <option value="Net Banking">Net Banking / Auto-Debit</option>
               <option value="Credit Card">Credit Card</option>
               <option value="Debit Card">Debit Card</option>
@@ -132,7 +135,7 @@
           <input type="month" id="selectedMonthInput" class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
         </div>
 
-        <!-- Export/Import Options Dropdown Button -->
+        <!-- Updated Export/Import Options Dropdown Button -->
         <div class="relative" id="backupDropdownWrapper">
           <button type="button" id="backupBtn" onclick="toggleBackupMenu(event)" class="p-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition flex items-center gap-1.5 cursor-pointer" title="Data Backup">
             <i data-lucide="database" class="w-4 h-4 text-slate-500 dark:text-slate-400"></i>
@@ -297,7 +300,7 @@
                   Payment Mode
                 </label>
                 <select id="paymentMethod" class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
-                  <option value="UPI">UPI (GPay/PhonePe)</option>
+                  <option value="UPI">UPI</option>
                   <option value="Net Banking">Net Banking / Auto-Debit</option>
                   <option value="Credit Card">Credit Card</option>
                   <option value="Debit Card">Debit Card</option>
@@ -367,7 +370,13 @@
             </h3>
             <span class="text-xs text-slate-400" id="catMonthText">This Month</span>
           </div>
-          <div id="categoryBreakdownList" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
+          
+          <!-- Chart.js Canvas -->
+          <div class="relative w-full aspect-square max-h-56 mx-auto mb-6">
+            <canvas id="categoryPieChart"></canvas>
+          </div>
+
+          <div id="categoryBreakdownList" class="space-y-3 max-h-64 overflow-y-auto pr-1"></div>
         </div>
       </div>
 
@@ -466,6 +475,7 @@
 
     let expenses = [];
     let currentSelectedMonth = '';
+    let categoryChartInstance = null; // Track Chart.js instance
 
     function formatINR(val) {
       const num = Number(val) || 0;
@@ -502,26 +512,6 @@
       }, 2600);
     }
 
-    // --- Dropdown Toggle Fix ---
-    window.toggleBackupMenu = function(e) {
-      e.stopPropagation();
-      const menu = document.getElementById('backupDropdownMenu');
-      menu.classList.toggle('hidden');
-    };
-
-    window.closeBackupMenu = function() {
-      const menu = document.getElementById('backupDropdownMenu');
-      if (menu) menu.classList.add('hidden');
-    };
-
-    document.addEventListener('click', (e) => {
-      const wrapper = document.getElementById('backupDropdownWrapper');
-      if (wrapper && !wrapper.contains(e.target)) {
-        window.closeBackupMenu();
-      }
-    });
-    // ---------------------------
-
     window.toggleDarkMode = function() {
       const html = document.documentElement;
       if (html.classList.contains('dark')) {
@@ -542,6 +532,24 @@
         document.documentElement.classList.remove('dark');
       }
     }
+
+    window.toggleBackupMenu = function(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('backupDropdownMenu');
+      menu.classList.toggle('hidden');
+    };
+
+    window.closeBackupMenu = function() {
+      const menu = document.getElementById('backupDropdownMenu');
+      if (menu) menu.classList.add('hidden');
+    };
+
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('backupDropdownWrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        window.closeBackupMenu();
+      }
+    });
 
     function onCategorySelectChange() {
       const catSelect = document.getElementById('expenseCategory');
@@ -863,7 +871,12 @@
 
     function renderCategoryBreakdown(aggregates, total) {
       const container = document.getElementById('categoryBreakdownList');
+      const ctx = document.getElementById('categoryPieChart').getContext('2d');
       const sortedCategories = Object.keys(aggregates).sort((a, b) => aggregates[b] - aggregates[a]);
+
+      if (categoryChartInstance) {
+        categoryChartInstance.destroy();
+      }
 
       if (sortedCategories.length === 0) {
         container.innerHTML = `
@@ -874,6 +887,46 @@
         `;
         return;
       }
+
+      const colorMap = {
+        'Rent': '#3b82f6', 'EMI': '#f43f5e', 'Utilities & Bills': '#f59e0b',
+        'Transport & Fuel': '#06b6d4', 'Groceries & Essentials': '#10b981',
+        'Healthcare & Medicines': '#ef4444', 'Dining & Takeout': '#f97316',
+        'Shopping & Tech': '#a855f7', 'Entertainment & OTT': '#6366f1',
+        'Personal Care': '#ec4899', 'Travel & Leisure': '#14b8a6', 'Miscellaneous': '#64748b'
+      };
+
+      const chartLabels = sortedCategories;
+      const chartData = sortedCategories.map(cat => aggregates[cat]);
+      const chartColors = sortedCategories.map(cat => colorMap[cat] || '#64748b');
+
+      categoryChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: chartLabels,
+          datasets: [{
+            data: chartData,
+            backgroundColor: chartColors,
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ` ${context.label}: ₹${context.parsed.toLocaleString('en-IN')}`;
+                }
+              }
+            }
+          }
+        }
+      });
 
       let html = '';
       sortedCategories.forEach(cat => {
@@ -897,7 +950,7 @@
               </div>
             </div>
             <div class="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-              <div class="h-full bg-blue-500 rounded-full" style="width: ${pct}%"></div>
+              <div class="h-full rounded-full" style="width: ${pct}%; background-color: ${colorMap[cat] || '#3b82f6'};"></div>
             </div>
           </div>
         `;
