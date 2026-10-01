@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SpendWise — Expense, EMI & Rent Tracker</title>
+  <title>SpendWise — Multi-User Expense Tracker</title>
 
   <!-- PWA & Mobile Web Meta -->
   <link rel="manifest" href="manifest.json">
@@ -55,6 +55,52 @@
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-full transition-colors duration-200">
   <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-120%] opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl text-sm font-medium text-white"></div>
 
+  <!-- Authentication Gate Modal (Shown if user is logged out) -->
+  <div id="authModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 mx-auto">
+          <i data-lucide="wallet-cards" class="w-7 h-7"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">Welcome to SpendWise</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Sign in or create an account to keep your expense ledger secure and private.</p>
+      </div>
+
+      <!-- Google Sign-In Button -->
+      <button type="button" onclick="handleGoogleLogin()" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center justify-center gap-3 shadow-xs cursor-pointer">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.33 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.18C.43 8.13 0 9.87 0 12s.43 3.87 1.18 5.39l4.09-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.16 2.67 1.18 6.61l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="flex items-center gap-4 text-slate-400 text-xs uppercase tracking-wider font-semibold">
+        <div class="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
+        <span>Or with Email</span>
+        <div class="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
+      </div>
+
+      <!-- Email/Password Form -->
+      <form id="emailAuthForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Email Address</label>
+          <input type="email" id="authEmail" required placeholder="you@example.com" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Password (Min 6 chars)</label>
+          <input type="password" id="authPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        
+        <div class="flex gap-2 pt-2">
+          <button type="submit" onclick="isSignUpMode = false;" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 transition shadow-md shadow-blue-500/20 cursor-pointer">
+            Sign In
+          </button>
+          <button type="button" onclick="handleEmailSignUp()" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition border border-blue-200 dark:border-blue-800/80 cursor-pointer">
+            Create Account
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Edit Expense Modal -->
   <div id="editModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
@@ -62,7 +108,7 @@
         <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <i data-lucide="edit-3" class="w-5 h-5 text-blue-500"></i> Edit Expense Entry
         </h3>
-        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -106,8 +152,8 @@
           </label>
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm rounded-lg font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
-          <button type="submit" id="editSubmitBtn" class="px-4 py-2 text-sm rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20">Save Changes</button>
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-sm rounded-lg font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer">Cancel</button>
+          <button type="submit" id="editSubmitBtn" class="px-4 py-2 text-sm rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 cursor-pointer">Save Changes</button>
         </div>
       </form>
     </div>
@@ -153,9 +199,14 @@
           </div>
         </div>
 
-        <button onclick="toggleDarkMode()" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition" aria-label="Toggle Theme">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" aria-label="Toggle Theme">
           <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
           <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+        </button>
+
+        <!-- Logout Button -->
+        <button onclick="handleLogout()" class="p-2 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition cursor-pointer" title="Log Out">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
         </button>
       </div>
     </div>
@@ -357,7 +408,7 @@
               </div>
             </div>
 
-            <button type="submit" id="addSubmitBtn" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 active:scale-[0.99] transition shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2">
+            <button type="submit" id="addSubmitBtn" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 active:scale-[0.99] transition shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 cursor-pointer">
               <i data-lucide="plus" class="w-4 h-4"></i> Add Expense Entry
             </button>
           </form>
@@ -410,7 +461,7 @@
               <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
               <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Single Date Inspector:</span>
               <input type="date" id="dateFilterInput" class="px-2.5 py-1 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 outline-none">
-              <button onclick="clearDateInspector()" id="clearDateBtn" class="hidden text-xs text-blue-600 dark:text-blue-400 hover:underline">Reset</button>
+              <button onclick="clearDateInspector()" id="clearDateBtn" class="hidden text-xs text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">Reset</button>
             </div>
             <div id="inspectorDailyTotalBadge" class="hidden sm:flex items-center gap-1.5 text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 px-3 py-1 rounded-lg">
               <span>Date Total:</span>
@@ -421,7 +472,7 @@
           <div id="logsContainer" class="mt-5 space-y-6">
             <div class="text-center py-12 text-slate-400">
               <i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin text-blue-500"></i>
-              <p class="text-xs">Connecting to cloud ledger...</p>
+              <p class="text-xs">Connecting to secure ledger...</p>
             </div>
           </div>
 
@@ -431,7 +482,7 @@
     </div>
   </main>
 
-  <!-- Firebase Scripts & Main Application Engine -->
+  <!-- Firebase Scripts & Multi-User Auth Engine -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -444,6 +495,16 @@
       updateDoc,
       doc 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithPopup,
+      GoogleAuthProvider,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      sendEmailVerification,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     // --- Configured with your Firebase credentials ---
     const firebaseConfig = {
@@ -456,29 +517,14 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    
-    // Initialize Firestore with offline persistent local caching enabled
+    const auth = getAuth(app);
     const db = initializeFirestore(app, {
       localCache: persistentLocalCache()
     });
-    
-    const expensesCol = collection(db, "expenses");
 
-    const CATEGORY_MAP = {
-      'Rent': { icon: 'home', color: 'text-blue-500 bg-blue-50 dark:bg-blue-950/70', essential: true },
-      'EMI': { icon: 'credit-card', color: 'text-rose-500 bg-rose-50 dark:bg-rose-950/70', essential: true },
-      'Utilities & Bills': { icon: 'zap', color: 'text-amber-500 bg-amber-50 dark:bg-amber-950/70', essential: true },
-      'Transport & Fuel': { icon: 'car', color: 'text-cyan-500 bg-cyan-50 dark:bg-cyan-950/70', essential: true },
-      'Groceries & Essentials': { icon: 'shopping-cart', color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/70', essential: true },
-      'Healthcare & Medicines': { icon: 'heart-pulse', color: 'text-red-500 bg-red-50 dark:bg-red-950/70', essential: true },
-      'Dining & Takeout': { icon: 'utensils', color: 'text-orange-500 bg-orange-50 dark:bg-orange-950/70', essential: false },
-      'Shopping & Tech': { icon: 'shopping-bag', color: 'text-purple-500 bg-purple-50 dark:bg-purple-950/70', essential: false },
-      'Entertainment & OTT': { icon: 'tv', color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-950/70', essential: false },
-      'Personal Care': { icon: 'sparkle', color: 'text-pink-500 bg-pink-50 dark:bg-pink-950/70', essential: false },
-      'Travel & Leisure': { icon: 'plane', color: 'text-teal-500 bg-teal-50 dark:bg-teal-950/70', essential: false },
-      'Miscellaneous': { icon: 'package', color: 'text-slate-500 bg-slate-100 dark:bg-slate-800', essential: false }
-    };
-
+    let currentUser = null;
+    let expensesCol = null;
+    let unsubscribeExpenses = null;
     let expenses = [];
     let currentSelectedMonth = '';
     let categoryChartInstance = null;
@@ -526,7 +572,109 @@
       window.toastTimeout = setTimeout(() => {
         toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-[-120%]', 'opacity-0');
-      }, 2500);
+      }, 3000);
+    };
+
+    // --- Authentication Handlers ---
+    window.handleGoogleLogin = async function() {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+        window.showToast('Signed in with Google successfully!');
+      } catch (err) {
+        window.showToast(err.message, 'error');
+      }
+    };
+
+    document.getElementById('emailAuthForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.showToast('Signed in successfully!');
+      } catch (err) {
+        window.showToast(err.message, 'error');
+      }
+    });
+
+    window.handleEmailSignUp = async function() {
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+
+      if (!email || password.length < 6) {
+        window.showToast('Enter a valid email and password (min 6 chars)', 'error');
+        return;
+      }
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        await sendEmailVerification(userCred.user);
+        window.showToast('Account created! Verification email sent.', 'info');
+      } catch (err) {
+        window.showToast(err.message, 'error');
+      }
+    };
+
+    window.handleLogout = async function() {
+      if (confirm('Are you sure you want to log out?')) {
+        try {
+          await signOut(auth);
+          window.showToast('Logged out successfully', 'info');
+        } catch (err) {
+          window.showToast(err.message, 'error');
+        }
+      }
+    };
+
+    // --- Auth State Observer ---
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      const modal = document.getElementById('authModal');
+
+      if (user) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+        // Bind user-specific Firestore collection path: /users/{uid}/expenses
+        expensesCol = collection(db, "users", user.uid, "expenses");
+        
+        // Listen to user's private expenses
+        if (unsubscribeExpenses) unsubscribeExpenses();
+        unsubscribeExpenses = onSnapshot(expensesCol, (snapshot) => {
+          expenses = [];
+          snapshot.forEach((docSnap) => {
+            expenses.push({ id: docSnap.id, ...docSnap.data() });
+          });
+          renderApp();
+        }, (error) => {
+          console.error("Firestore sync error:", error);
+        });
+
+      } else {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        if (unsubscribeExpenses) unsubscribeExpenses();
+        expenses = [];
+        renderApp();
+      }
+    });
+
+    // --- App Logic & Event Listeners ---
+    const CATEGORY_MAP = {
+      'Rent': { icon: 'home', color: 'text-blue-500 bg-blue-50 dark:bg-blue-950/70', essential: true },
+      'EMI': { icon: 'credit-card', color: 'text-rose-500 bg-rose-50 dark:bg-rose-950/70', essential: true },
+      'Utilities & Bills': { icon: 'zap', color: 'text-amber-500 bg-amber-50 dark:bg-amber-950/70', essential: true },
+      'Transport & Fuel': { icon: 'car', color: 'text-cyan-500 bg-cyan-50 dark:bg-cyan-950/70', essential: true },
+      'Groceries & Essentials': { icon: 'shopping-cart', color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/70', essential: true },
+      'Healthcare & Medicines': { icon: 'heart-pulse', color: 'text-red-500 bg-red-50 dark:bg-red-950/70', essential: true },
+      'Dining & Takeout': { icon: 'utensils', color: 'text-orange-500 bg-orange-50 dark:bg-orange-950/70', essential: false },
+      'Shopping & Tech': { icon: 'shopping-bag', color: 'text-purple-500 bg-purple-50 dark:bg-purple-950/70', essential: false },
+      'Entertainment & OTT': { icon: 'tv', color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-950/70', essential: false },
+      'Personal Care': { icon: 'sparkle', color: 'text-pink-500 bg-pink-50 dark:bg-pink-950/70', essential: false },
+      'Travel & Leisure': { icon: 'plane', color: 'text-teal-500 bg-teal-50 dark:bg-teal-950/70', essential: false },
+      'Miscellaneous': { icon: 'package', color: 'text-slate-500 bg-slate-100 dark:bg-slate-800', essential: false }
     };
 
     window.toggleDarkMode = function() {
@@ -586,16 +734,11 @@
     }
     document.getElementById('expenseCategory').addEventListener('change', onCategorySelectChange);
 
-    // Prevent typing 'e', 'E', '+', or '-' in numeric amount inputs
     document.getElementById('expenseAmount').addEventListener('keydown', (e) => {
-      if (['e', 'E', '+', '-'].includes(e.key)) {
-        e.preventDefault();
-      }
+      if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
     });
     document.getElementById('editAmount').addEventListener('keydown', (e) => {
-      if (['e', 'E', '+', '-'].includes(e.key)) {
-        e.preventDefault();
-      }
+      if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
     });
 
     function populateEditCategories() {
@@ -641,10 +784,10 @@
 
     window.deleteExpense = async function(id) {
       const target = expenses.find(x => x.id === id);
-      if (!target) return;
+      if (!target || !currentUser) return;
       if (confirm(`Delete "${target.title}"?`)) {
         try {
-          await deleteDoc(doc(db, "expenses", id));
+          await deleteDoc(doc(db, "users", currentUser.uid, "expenses", id));
           window.showToast(`Removed "${target.title}"`, 'info');
         } catch (e) {
           window.showToast(e.message, 'error');
@@ -698,39 +841,11 @@
       window.showToast('Backup JSON downloaded');
     };
 
-    // Independent Network & Sync Status Manager (Strictly tied to browser state)
-    function updateNetworkStatus() {
-      const statusEl = document.getElementById("syncStatus");
-      if (!navigator.onLine) {
-        statusEl.innerHTML = `
-          <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-          Offline (Cached)
-        `;
-      } else {
-        statusEl.innerHTML = `
-          <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          Cloud Synced
-        `;
-      }
-    }
-
-    window.addEventListener('online', updateNetworkStatus);
-    window.addEventListener('offline', updateNetworkStatus);
-
-    // Real-time Cloud Firestore Listener with Local Caching
-    onSnapshot(expensesCol, (snapshot) => {
-      expenses = [];
-      snapshot.forEach((docSnap) => {
-        expenses.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      renderApp();
-    }, (error) => {
-      console.error("Firestore sync error:", error);
-    });
-
-    // Add Expense Handler (Non-blocking offline write queue)
+    // Add Expense Handler
     document.getElementById('expenseForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!currentUser) return;
+
       const date = document.getElementById('expenseDate').value;
       const amount = parseFloat(document.getElementById('expenseAmount').value);
       const title = document.getElementById('expenseTitle').value.trim();
@@ -748,7 +863,6 @@
       btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...`;
       lucide.createIcons();
 
-      // Instantly reset button so multiple offline entries can be added rapidly without getting stuck
       setTimeout(() => {
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="plus" class="w-4 h-4"></i> Add Expense Entry`;
@@ -783,6 +897,8 @@
     // Edit Expense Handler
     document.getElementById('editExpenseForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!currentUser) return;
+
       const id = document.getElementById('editId').value;
       const date = document.getElementById('editDate').value;
       const amount = parseFloat(document.getElementById('editAmount').value);
@@ -801,7 +917,7 @@
       btn.innerText = 'Saving...';
 
       try {
-        await updateDoc(doc(db, "expenses", id), {
+        await updateDoc(doc(db, "users", currentUser.uid, "expenses", id), {
           date,
           amount,
           title,
@@ -819,7 +935,6 @@
       }
     });
 
-    // Filter controls
     document.getElementById('selectedMonthInput').addEventListener('change', (e) => {
       currentSelectedMonth = e.target.value;
       renderApp();
@@ -1086,10 +1201,10 @@
                   <span class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">${formatINR(item.amount)}</span>
                 </div>
                 <div class="flex items-center gap-1">
-                  <button onclick="openEditModal('${item.id}')" class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Edit">
+                  <button onclick="openEditModal('${item.id}')" class="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer" title="Edit">
                     <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                   </button>
-                  <button onclick="deleteExpense('${item.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Delete">
+                  <button onclick="deleteExpense('${item.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer" title="Delete">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                   </button>
                 </div>
@@ -1126,7 +1241,6 @@
 
     // Startup initialization
     initTheme();
-    updateNetworkStatus();
     const today = new Date();
     const yr = today.getFullYear();
     const mo = String(today.getMonth() + 1).padStart(2, '0');
