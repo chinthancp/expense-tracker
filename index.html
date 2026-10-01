@@ -435,7 +435,8 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
-      getFirestore, 
+      initializeFirestore,
+      persistentLocalCache,
       collection, 
       addDoc, 
       onSnapshot, 
@@ -455,7 +456,12 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    
+    // Initialize Firestore with offline persistent local caching enabled
+    const db = initializeFirestore(app, {
+      localCache: persistentLocalCache()
+    });
+    
     const expensesCol = collection(db, "expenses");
 
     const CATEGORY_MAP = {
@@ -680,7 +686,7 @@
       window.showToast('Backup JSON downloaded');
     };
 
-    // Real-time Cloud Firestore Listener
+    // Real-time Cloud Firestore Listener with Local Caching
     onSnapshot(expensesCol, (snapshot) => {
       expenses = [];
       snapshot.forEach((docSnap) => {
@@ -709,7 +715,6 @@
       const paymentMethod = document.getElementById('paymentMethod').value;
       const isEssential = document.getElementById('isEssentialCheck').checked;
 
-      // VALIDATION: Make sure amount is NOT less than zero.
       if (!date || isNaN(amount) || amount < 0 || !title) {
         window.showToast('Please fill all required fields correctly', 'error');
         return;
@@ -760,7 +765,6 @@
       const paymentMethod = document.getElementById('editPaymentMethod').value;
       const isEssential = document.getElementById('editIsEssential').checked;
 
-      // VALIDATION: Make sure amount is NOT less than zero.
       if (!id || !date || isNaN(amount) || amount < 0 || !title) {
         window.showToast('Invalid field values', 'error');
         return;
@@ -1002,7 +1006,10 @@
         const dayItems = grouped[date];
         const dailyTotal = dayItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
         const readableDate = formatDisplayDate(date);
-        const todayStr = new Date().toISOString().split('T')[0];
+        
+        // Local timezone calculation for "Today" pill
+        const localNow = new Date();
+        const todayStr = localNow.getFullYear() + '-' + String(localNow.getMonth() + 1).padStart(2, '0') + '-' + String(localNow.getDate()).padStart(2, '0');
         const isToday = date === todayStr;
 
         fullHTML += `
