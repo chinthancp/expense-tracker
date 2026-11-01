@@ -137,7 +137,7 @@
         </div>
         <div>
           <h3 class="font-bold text-lg text-slate-900 dark:text-white">Settings & Custom Categories</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Configure your profile, overall cap, and individual category limits</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Configure profile, overall cap, and individual category limits</p>
         </div>
       </div>
 
@@ -151,25 +151,26 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Overall Monthly Budget Cap (₹)</label>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Overall Monthly Spending Cap (₹)</label>
           <div class="flex gap-2">
             <input type="number" id="profileBudgetInput" min="0" step="any" placeholder="e.g. 50000" class="flex-1 px-3.5 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
             <button onclick="saveMonthlyBudget()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition cursor-pointer">Set Cap</button>
           </div>
         </div>
 
-        <!-- Custom Category & Limit Management -->
+        <!-- Custom Category Management with Individual Save & Edit -->
         <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
               <i data-lucide="sliders" class="w-4 h-4"></i> Category Spending Limits
             </h4>
-            <span class="text-[11px] text-slate-400">Custom categories & caps</span>
+            <span id="categoryFormModeBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">New</span>
           </div>
 
           <div class="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2.5">
+            <input type="hidden" id="editingCategoryOriginalName" value="">
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
-              <input type="text" id="newCategoryName" placeholder="Category Name (e.g. EMI)" class="sm:col-span-5 px-3 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
+              <input type="text" id="newCategoryName" placeholder="Category Name" class="sm:col-span-5 px-3 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
               <input type="number" id="newCategoryLimit" min="0" step="any" placeholder="Limit ₹ (0 for none)" class="sm:col-span-4 px-3 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
               <div class="sm:col-span-3 flex items-center gap-1.5">
                 <select id="newCategoryType" class="w-full px-2 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
@@ -178,9 +179,14 @@
                 </select>
               </div>
             </div>
-            <button onclick="addCustomCategory()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
-              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add / Update Category Limit
-            </button>
+            <div class="flex gap-2">
+              <button id="saveCategoryBtn" onclick="saveCustomCategory()" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i> Save Category
+              </button>
+              <button id="cancelCategoryEditBtn" onclick="cancelCategoryEdit()" class="hidden px-3 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                Cancel
+              </button>
+            </div>
           </div>
 
           <div id="categoryLimitList" class="space-y-2 max-h-52 overflow-y-auto pr-1"></div>
@@ -612,9 +618,9 @@
       addDoc, 
       onSnapshot, 
       deleteDoc, 
-      updateDoc,
-      setDoc,
-      getDoc,
+      updateDoc, 
+      setDoc, 
+      getDoc, 
       doc 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import {
@@ -653,7 +659,6 @@
     let isSignUpMode = false;
     window.toastTimeout = null;
 
-    // Default categories matching user specifications
     const DEFAULT_CATEGORIES = {
       'House Rent': { icon: 'home', color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/70', essential: true, limit: 0 },
       'EMI': { icon: 'credit-card', color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/70', essential: true, limit: 0 },
@@ -813,6 +818,7 @@
       window.closeProfileDropdown();
       document.getElementById('profileDisplayNameInput').value = userProfile?.displayName || currentUser?.displayName || '';
       document.getElementById('profileBudgetInput').value = userProfile?.monthlyBudget || '';
+      cancelCategoryEdit();
       renderCategorySettingsList();
       document.getElementById('profileModal').classList.remove('hidden');
       document.getElementById('profileModal').classList.add('flex');
@@ -997,45 +1003,84 @@
         const userDocRef = doc(db, "users", currentUser.uid, "profile", "info");
         await updateDoc(userDocRef, { monthlyBudget: budgetVal });
         userProfile.monthlyBudget = budgetVal;
-        closeProfileModal();
         renderApp();
-        window.showToast('Monthly budget cap updated!');
+        window.showToast('Overall monthly spending cap updated!');
       } catch (err) {
         window.showToast(err.message, 'error');
       }
     };
 
-    // Category Management
-    window.addCustomCategory = async function() {
-      const name = document.getElementById('newCategoryName').value.trim();
+    // Category Management (Add, Edit, Save, Cancel, Delete)
+    window.editCategory = function(name) {
+      const conf = CATEGORY_MAP[name];
+      if (!conf) return;
+
+      document.getElementById('editingCategoryOriginalName').value = name;
+      document.getElementById('newCategoryName').value = name;
+      document.getElementById('newCategoryLimit').value = conf.limit || '';
+      document.getElementById('newCategoryType').value = conf.essential ? 'essential' : 'flexible';
+
+      document.getElementById('categoryFormModeBadge').textContent = 'Editing';
+      document.getElementById('categoryFormModeBadge').className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold';
+      document.getElementById('saveCategoryBtn').innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i> Update Category`;
+      document.getElementById('cancelCategoryEditBtn').classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    window.cancelCategoryEdit = function() {
+      document.getElementById('editingCategoryOriginalName').value = '';
+      document.getElementById('newCategoryName').value = '';
+      document.getElementById('newCategoryLimit').value = '';
+      document.getElementById('newCategoryType').value = 'essential';
+
+      document.getElementById('categoryFormModeBadge').textContent = 'New';
+      document.getElementById('categoryFormModeBadge').className = 'text-[10px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold';
+      document.getElementById('saveCategoryBtn').innerHTML = `<i data-lucide="save" class="w-3.5 h-3.5"></i> Save Category`;
+      document.getElementById('cancelCategoryEditBtn').classList.add('hidden');
+      lucide.createIcons();
+    };
+
+    window.saveCustomCategory = async function() {
+      const originalName = document.getElementById('editingCategoryOriginalName').value.trim();
+      const newName = document.getElementById('newCategoryName').value.trim();
       const limit = parseFloat(document.getElementById('newCategoryLimit').value) || 0;
       const isEssential = document.getElementById('newCategoryType').value === 'essential';
 
-      if (!name) {
+      if (!newName) {
         window.showToast('Please enter a category name', 'error');
         return;
       }
 
-      const existing = CATEGORY_MAP[name] || {};
-      CATEGORY_MAP[name] = {
-        icon: existing.icon || (isEssential ? 'shield-alert' : 'tag'),
-        color: existing.color || (isEssential ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/70' : 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/70'),
+      // Preserve existing icon and color if renaming or updating
+      const oldConfig = (originalName && CATEGORY_MAP[originalName]) ? CATEGORY_MAP[originalName] : (CATEGORY_MAP[newName] || {});
+
+      // If renamed, remove previous entry
+      if (originalName && originalName !== newName) {
+        delete CATEGORY_MAP[originalName];
+      }
+
+      CATEGORY_MAP[newName] = {
+        icon: oldConfig.icon || (isEssential ? 'shield-alert' : 'tag'),
+        color: oldConfig.color || (isEssential ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/70' : 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/70'),
         essential: isEssential,
         limit: limit
       };
 
-      document.getElementById('newCategoryName').value = '';
-      document.getElementById('newCategoryLimit').value = '';
-
       if (currentUser) {
-        const userDocRef = doc(db, "users", currentUser.uid, "profile", "info");
-        await updateDoc(userDocRef, { categories: CATEGORY_MAP });
+        try {
+          const userDocRef = doc(db, "users", currentUser.uid, "profile", "info");
+          await updateDoc(userDocRef, { categories: CATEGORY_MAP });
+        } catch (err) {
+          window.showToast(err.message, 'error');
+          return;
+        }
       }
 
+      cancelCategoryEdit();
       populateCategoryDropdowns();
       renderCategorySettingsList();
       renderApp();
-      window.showToast(`Updated "${name}" category limit!`);
+      window.showToast(`Saved "${newName}" category limit!`);
     };
 
     window.deleteCustomCategory = async function(catName) {
@@ -1044,6 +1089,9 @@
         if (currentUser) {
           const userDocRef = doc(db, "users", currentUser.uid, "profile", "info");
           await updateDoc(userDocRef, { categories: CATEGORY_MAP });
+        }
+        if (document.getElementById('editingCategoryOriginalName').value === catName) {
+          cancelCategoryEdit();
         }
         populateCategoryDropdowns();
         renderCategorySettingsList();
@@ -1064,9 +1112,12 @@
               ${conf.essential ? 'Fixed' : 'Flexible'}
             </span>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-blue-600 dark:text-blue-400">${conf.limit > 0 ? formatINR(conf.limit) : 'No Limit'}</span>
-            <button onclick="deleteCustomCategory('${name}')" class="p-1 text-slate-400 hover:text-rose-500 cursor-pointer">
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold text-blue-600 dark:text-blue-400 mr-1">${conf.limit > 0 ? formatINR(conf.limit) : 'No Limit'}</span>
+            <button onclick="editCategory('${name}')" class="p-1 text-slate-400 hover:text-blue-500 cursor-pointer" title="Edit Category">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="deleteCustomCategory('${name}')" class="p-1 text-slate-400 hover:text-rose-500 cursor-pointer" title="Delete Category">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </div>
