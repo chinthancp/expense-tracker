@@ -124,9 +124,9 @@
     </div>
   </div>
 
-  <!-- Profile & Settings Modal -->
-  <div id="profileModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-8 space-y-6 relative animate-fade-in">
+  <!-- Profile & Custom Category Budget Settings Modal -->
+  <div id="profileModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 space-y-6 relative animate-fade-in my-8 max-h-[90vh] overflow-y-auto">
       <button onclick="closeProfileModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
@@ -136,8 +136,8 @@
           <i data-lucide="settings" class="w-5 h-5"></i>
         </div>
         <div>
-          <h3 class="font-bold text-lg text-slate-900 dark:text-white">Settings & Profile</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Manage your profile, budget cap, and account</p>
+          <h3 class="font-bold text-lg text-slate-900 dark:text-white">Settings & Custom Categories</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Configure your profile, overall cap, and individual category limits</p>
         </div>
       </div>
 
@@ -145,26 +145,53 @@
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Display Name</label>
           <div class="flex gap-2">
-            <input type="text" id="profileDisplayNameInput" placeholder="Enter your name" class="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
+            <input type="text" id="profileDisplayNameInput" placeholder="Enter your name" class="flex-1 px-3.5 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
             <button onclick="saveProfileDisplayName()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition cursor-pointer">Save</button>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Monthly Spending Budget Cap (₹)</label>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Overall Monthly Budget Cap (₹)</label>
           <div class="flex gap-2">
-            <input type="number" id="profileBudgetInput" min="0" step="any" placeholder="e.g. 30000" class="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
+            <input type="number" id="profileBudgetInput" min="0" step="any" placeholder="e.g. 50000" class="flex-1 px-3.5 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
             <button onclick="saveMonthlyBudget()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition cursor-pointer">Set Cap</button>
           </div>
-          <p class="text-[11px] text-slate-400 mt-1">Receive visual warning badges when approaching this cap.</p>
         </div>
 
+        <!-- Custom Category & Limit Management -->
         <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+              <i data-lucide="sliders" class="w-4 h-4"></i> Category Spending Limits
+            </h4>
+            <span class="text-[11px] text-slate-400">Custom categories & caps</span>
+          </div>
+
+          <div class="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2.5">
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <input type="text" id="newCategoryName" placeholder="Category Name (e.g. EMI)" class="sm:col-span-5 px-3 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
+              <input type="number" id="newCategoryLimit" min="0" step="any" placeholder="Limit ₹ (0 for none)" class="sm:col-span-4 px-3 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
+              <div class="sm:col-span-3 flex items-center gap-1.5">
+                <select id="newCategoryType" class="w-full px-2 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none">
+                  <option value="essential">Fixed</option>
+                  <option value="flexible">Flexible</option>
+                </select>
+              </div>
+            </div>
+            <button onclick="addCustomCategory()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add / Update Category Limit
+            </button>
+          </div>
+
+          <div id="categoryLimitList" class="space-y-2 max-h-52 overflow-y-auto pr-1"></div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
           <h4 class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Danger Zone</h4>
           <p class="text-xs text-slate-500 dark:text-slate-400">
             Deleting your account schedules your data for permanent deletion with a <strong>7-day recovery window</strong>.
           </p>
-          <button onclick="requestAccountDeletion()" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition cursor-pointer">
+          <button onclick="requestAccountDeletion()" class="w-full py-2 px-4 rounded-xl font-bold text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition cursor-pointer">
             Delete Account Permanently
           </button>
         </div>
@@ -480,22 +507,6 @@
                 </span>
               </div>
               <select id="expenseCategory" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition">
-                <optgroup label="Essential / Fixed Commitments">
-                  <option value="Rent" data-essential="true">🏠 House Rent</option>
-                  <option value="EMI" data-essential="true">💳 Loan / Card EMI</option>
-                  <option value="Utilities & Bills" data-essential="true">⚡ Utilities & Bills (LPG, Wifi, Power)</option>
-                  <option value="Transport & Fuel" data-essential="true">⛽ Transport & Fuel</option>
-                  <option value="Groceries & Essentials" data-essential="true">🛒 Groceries & Household Essentials</option>
-                  <option value="Healthcare & Medicines" data-essential="true">💊 Healthcare & Medical</option>
-                </optgroup>
-                <optgroup label="Discretionary / Flexible Outflows">
-                  <option value="Dining & Takeout" data-essential="false">🍔 Dining Out & Food Delivery</option>
-                  <option value="Shopping & Tech" data-essential="false">🛍️ Shopping & Gadgets</option>
-                  <option value="Entertainment & OTT" data-essential="false">🎬 Entertainment & Subscriptions</option>
-                  <option value="Personal Care" data-essential="false">💇 Personal Care & Grooming</option>
-                  <option value="Travel & Leisure" data-essential="false">✈️ Travel & Leisure</option>
-                  <option value="Miscellaneous" data-essential="false">📦 Miscellaneous</option>
-                </optgroup>
               </select>
             </div>
 
@@ -513,7 +524,7 @@
                   <label for="isEssentialCheck" class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 cursor-pointer">
                     Necessary / Essential Expense
                   </label>
-                  <p class="text-[11px] text-slate-500 dark:text-slate-400">Classify as non-negotiable living cost (EMI, Rent, etc.)</p>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400">Classify as non-negotiable living cost</p>
                 </div>
               </div>
             </div>
@@ -527,7 +538,7 @@
         <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
             <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-500 dark:text-indigo-400"></i> Category Breakdown
+              <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-500 dark:text-indigo-400"></i> Category Breakdown & Limits
             </h3>
             <span class="text-xs text-slate-400" id="catMonthText">This Month</span>
           </div>
@@ -536,7 +547,7 @@
             <canvas id="categoryPieChart"></canvas>
           </div>
 
-          <div id="categoryBreakdownList" class="space-y-3 max-h-64 overflow-y-auto pr-1"></div>
+          <div id="categoryBreakdownList" class="space-y-4 max-h-72 overflow-y-auto pr-1"></div>
         </div>
       </div>
 
@@ -642,6 +653,20 @@
     let isSignUpMode = false;
     window.toastTimeout = null;
 
+    // Default categories matching user specifications
+    const DEFAULT_CATEGORIES = {
+      'House Rent': { icon: 'home', color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/70', essential: true, limit: 0 },
+      'EMI': { icon: 'credit-card', color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/70', essential: true, limit: 0 },
+      'Utilities (Power, Wi-Fi, Water)': { icon: 'zap', color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/70', essential: true, limit: 0 },
+      'Food & Household Expense': { icon: 'shopping-cart', color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/70', essential: true, limit: 0 },
+      'Fuel & Transit': { icon: 'car', color: 'text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/70', essential: true, limit: 0 },
+      'Personal Care': { icon: 'sparkle', color: 'text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-950/70', essential: false, limit: 0 },
+      'Savings Goal': { icon: 'piggy-bank', color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70', essential: false, limit: 0 },
+      'Miscellaneous': { icon: 'package', color: 'text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800', essential: false, limit: 0 }
+    };
+
+    let CATEGORY_MAP = { ...DEFAULT_CATEGORIES };
+
     function formatINR(val) {
       const num = Number(val) || 0;
       return '₹' + num.toLocaleString('en-IN', {
@@ -662,7 +687,6 @@
       });
     }
 
-    // Dynamic Hash URL updater for the logged-in user
     function updateUserURL(user) {
       if (user) {
         const namePart = (userProfile?.displayName || user.displayName || user.email.split('@')[0])
@@ -789,6 +813,7 @@
       window.closeProfileDropdown();
       document.getElementById('profileDisplayNameInput').value = userProfile?.displayName || currentUser?.displayName || '';
       document.getElementById('profileBudgetInput').value = userProfile?.monthlyBudget || '';
+      renderCategorySettingsList();
       document.getElementById('profileModal').classList.remove('hidden');
       document.getElementById('profileModal').classList.add('flex');
       lucide.createIcons();
@@ -898,6 +923,7 @@
           displayName: user.displayName || user.email.split('@')[0],
           email: user.email,
           monthlyBudget: 0,
+          categories: DEFAULT_CATEGORIES,
           status: 'active',
           deletedAt: null,
           createdAt: Date.now()
@@ -906,6 +932,9 @@
         userProfile = initialProfile;
       } else {
         userProfile = snap.data();
+        if (userProfile.categories) {
+          CATEGORY_MAP = { ...DEFAULT_CATEGORIES, ...userProfile.categories };
+        }
         if (userProfile.status === 'pending_deletion' && userProfile.deletedAt) {
           const daysPassed = (Date.now() - userProfile.deletedAt) / (1000 * 60 * 60 * 24);
           if (daysPassed <= 7) {
@@ -918,6 +947,7 @@
           }
         }
       }
+      populateCategoryDropdowns();
     }
 
     window.restoreAccount = async function() {
@@ -975,6 +1005,107 @@
       }
     };
 
+    // Category Management
+    window.addCustomCategory = async function() {
+      const name = document.getElementById('newCategoryName').value.trim();
+      const limit = parseFloat(document.getElementById('newCategoryLimit').value) || 0;
+      const isEssential = document.getElementById('newCategoryType').value === 'essential';
+
+      if (!name) {
+        window.showToast('Please enter a category name', 'error');
+        return;
+      }
+
+      const existing = CATEGORY_MAP[name] || {};
+      CATEGORY_MAP[name] = {
+        icon: existing.icon || (isEssential ? 'shield-alert' : 'tag'),
+        color: existing.color || (isEssential ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/70' : 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/70'),
+        essential: isEssential,
+        limit: limit
+      };
+
+      document.getElementById('newCategoryName').value = '';
+      document.getElementById('newCategoryLimit').value = '';
+
+      if (currentUser) {
+        const userDocRef = doc(db, "users", currentUser.uid, "profile", "info");
+        await updateDoc(userDocRef, { categories: CATEGORY_MAP });
+      }
+
+      populateCategoryDropdowns();
+      renderCategorySettingsList();
+      renderApp();
+      window.showToast(`Updated "${name}" category limit!`);
+    };
+
+    window.deleteCustomCategory = async function(catName) {
+      if (confirm(`Remove custom category "${catName}"?`)) {
+        delete CATEGORY_MAP[catName];
+        if (currentUser) {
+          const userDocRef = doc(db, "users", currentUser.uid, "profile", "info");
+          await updateDoc(userDocRef, { categories: CATEGORY_MAP });
+        }
+        populateCategoryDropdowns();
+        renderCategorySettingsList();
+        renderApp();
+        window.showToast(`Removed category "${catName}"`);
+      }
+    };
+
+    function renderCategorySettingsList() {
+      const container = document.getElementById('categoryLimitList');
+      if (!container) return;
+
+      container.innerHTML = Object.entries(CATEGORY_MAP).map(([name, conf]) => `
+        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-800 dark:text-slate-200">${name}</span>
+            <span class="text-[10px] px-1.5 py-0.2 rounded ${conf.essential ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300' : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'} font-bold">
+              ${conf.essential ? 'Fixed' : 'Flexible'}
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-blue-600 dark:text-blue-400">${conf.limit > 0 ? formatINR(conf.limit) : 'No Limit'}</span>
+            <button onclick="deleteCustomCategory('${name}')" class="p-1 text-slate-400 hover:text-rose-500 cursor-pointer">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function populateCategoryDropdowns() {
+      const addSelect = document.getElementById('expenseCategory');
+      const editSelect = document.getElementById('editCategory');
+
+      const essentials = [];
+      const flexibles = [];
+
+      Object.entries(CATEGORY_MAP).forEach(([cat, conf]) => {
+        const opt = `<option value="${cat}" data-essential="${conf.essential}">${cat} ${conf.limit > 0 ? `(Cap: ${formatINR(conf.limit)})` : ''}</option>`;
+        if (conf.essential) essentials.push(opt);
+        else flexibles.push(opt);
+      });
+
+      const fullHTML = `
+        <optgroup label="Essential / Fixed Commitments">
+          ${essentials.join('')}
+        </optgroup>
+        <optgroup label="Discretionary / Flexible Outflows">
+          ${flexibles.join('')}
+        </optgroup>
+      `;
+
+      if (addSelect) {
+        addSelect.innerHTML = fullHTML;
+        onCategorySelectChange();
+      }
+      if (editSelect) {
+        editSelect.innerHTML = fullHTML;
+      }
+    }
+
     window.requestAccountDeletion = async function() {
       if (!currentUser) return;
       if (confirm('Are you sure you want to delete your account? All your data will be scheduled for permanent removal in 7 days.')) {
@@ -1024,6 +1155,8 @@
         updateUserURL(null);
         if (unsubscribeExpenses) unsubscribeExpenses();
         expenses = [];
+        CATEGORY_MAP = { ...DEFAULT_CATEGORIES };
+        populateCategoryDropdowns();
         renderApp();
         document.getElementById('syncStatus').innerHTML = `<span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0"></span><span class="truncate">Please Sign In</span>`;
       }
@@ -1068,35 +1201,23 @@
       lucide.createIcons();
     }
 
-    const CATEGORY_MAP = {
-      'Rent': { icon: 'home', color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/70', essential: true },
-      'EMI': { icon: 'credit-card', color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/70', essential: true },
-      'Utilities & Bills': { icon: 'zap', color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/70', essential: true },
-      'Transport & Fuel': { icon: 'car', color: 'text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/70', essential: true },
-      'Groceries & Essentials': { icon: 'shopping-cart', color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/70', essential: true },
-      'Healthcare & Medicines': { icon: 'heart-pulse', color: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/70', essential: true },
-      'Dining & Takeout': { icon: 'utensils', color: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/70', essential: false },
-      'Shopping & Tech': { icon: 'shopping-bag', color: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/70', essential: false },
-      'Entertainment & OTT': { icon: 'tv', color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70', essential: false },
-      'Personal Care': { icon: 'sparkle', color: 'text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-950/70', essential: false },
-      'Travel & Leisure': { icon: 'plane', color: 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/70', essential: false },
-      'Miscellaneous': { icon: 'package', color: 'text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800', essential: false }
-    };
-
     function onCategorySelectChange() {
       const catSelect = document.getElementById('expenseCategory');
+      if (!catSelect || !catSelect.selectedIndex) return;
       const opt = catSelect.options[catSelect.selectedIndex];
       const isEssential = opt.getAttribute('data-essential') === 'true';
       const check = document.getElementById('isEssentialCheck');
       const badge = document.getElementById('categoryTypeBadge');
 
-      check.checked = isEssential;
-      if (isEssential) {
-        badge.textContent = 'Essential';
-        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300';
-      } else {
-        badge.textContent = 'Flexible';
-        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300';
+      if (check) check.checked = isEssential;
+      if (badge) {
+        if (isEssential) {
+          badge.textContent = 'Essential';
+          badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300';
+        } else {
+          badge.textContent = 'Flexible';
+          badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300';
+        }
       }
     }
     document.getElementById('expenseCategory').addEventListener('change', onCategorySelectChange);
@@ -1107,17 +1228,6 @@
     document.getElementById('editAmount').addEventListener('keydown', (e) => {
       if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
     });
-
-    function populateEditCategories() {
-      const editCat = document.getElementById('editCategory');
-      editCat.innerHTML = '';
-      Object.keys(CATEGORY_MAP).forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = (CATEGORY_MAP[cat].essential ? '📌 ' : '🔹 ') + cat;
-        editCat.appendChild(opt);
-      });
-    }
 
     window.syncEditEssential = function() {
       const cat = document.getElementById('editCategory').value;
@@ -1366,6 +1476,7 @@
       document.getElementById('barEssential').style.width = `${essentialPct}%`;
       document.getElementById('barFlexible').style.width = `${flexiblePct}%`;
 
+      // Overall monthly budget cap
       const monthlyBudgetCap = Number(userProfile?.monthlyBudget) || 0;
       const budgetCapText = document.getElementById('budgetCapText');
       const budgetProgressBar = document.getElementById('budgetProgressBar');
@@ -1439,10 +1550,46 @@
     function renderCategoryBreakdown(aggregates, total) {
       const container = document.getElementById('categoryBreakdownList');
       const ctx = document.getElementById('categoryPieChart').getContext('2d');
-      const sortedCategories = Object.keys(aggregates).sort((a, b) => aggregates[b] - aggregates[a]);
+      const allCategoryKeys = Array.from(new Set([...Object.keys(CATEGORY_MAP), ...Object.keys(aggregates)]));
+      const sortedCategories = allCategoryKeys.filter(cat => (aggregates[cat] || 0) > 0 || (CATEGORY_MAP[cat]?.limit || 0) > 0)
+        .sort((a, b) => (aggregates[b] || 0) - (aggregates[a] || 0));
 
       if (categoryChartInstance) {
         categoryChartInstance.destroy();
+      }
+
+      const chartCategories = Object.keys(aggregates).filter(cat => aggregates[cat] > 0);
+      if (chartCategories.length > 0) {
+        const colorPalette = ['#3b82f6', '#f43f5e', '#f59e0b', '#06b6d4', '#10b981', '#ef4444', '#a855f7', '#6366f1', '#ec4899', '#14b8a6', '#64748b'];
+        const chartColors = chartCategories.map((_, idx) => colorPalette[idx % colorPalette.length]);
+
+        categoryChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: chartCategories,
+            datasets: [{
+              data: chartCategories.map(cat => aggregates[cat]),
+              backgroundColor: chartColors,
+              borderWidth: 0,
+              hoverOffset: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return ` ${context.label}: ₹${context.parsed.toLocaleString('en-IN')}`;
+                  }
+                }
+              }
+            }
+          }
+        });
       }
 
       if (sortedCategories.length === 0) {
@@ -1455,58 +1602,39 @@
         return;
       }
 
-      const colorMap = {
-        'Rent': '#3b82f6', 'EMI': '#f43f5e', 'Utilities & Bills': '#f59e0b',
-        'Transport & Fuel': '#06b6d4', 'Groceries & Essentials': '#10b981',
-        'Healthcare & Medicines': '#ef4444', 'Dining & Takeout': '#f97316',
-        'Shopping & Tech': '#a855f7', 'Entertainment & OTT': '#6366f1',
-        'Personal Care': '#ec4899', 'Travel & Leisure': '#14b8a6', 'Miscellaneous': '#64748b'
-      };
-
-      const chartLabels = sortedCategories;
-      const chartData = sortedCategories.map(cat => aggregates[cat]);
-      const chartColors = sortedCategories.map(cat => colorMap[cat] || '#64748b');
-
-      categoryChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: chartLabels,
-          datasets: [{
-            data: chartData,
-            backgroundColor: chartColors,
-            borderWidth: 0,
-            hoverOffset: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '70%',
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return ` ${context.label}: ₹${context.parsed.toLocaleString('en-IN')}`;
-                }
-              }
-            }
-          }
-        }
-      });
-
       let html = '';
       sortedCategories.forEach(cat => {
-        const amt = aggregates[cat];
+        const amt = aggregates[cat] || 0;
         const pct = total > 0 ? Math.round((amt / total) * 100) : 0;
-        const config = CATEGORY_MAP[cat] || { icon: 'tag', color: 'text-slate-500 bg-slate-100 dark:bg-slate-800', essential: false };
+        const config = CATEGORY_MAP[cat] || { icon: 'tag', color: 'text-slate-500 bg-slate-100 dark:bg-slate-800', essential: false, limit: 0 };
+        const catLimit = Number(config.limit) || 0;
+
+        let limitStatusHTML = '';
+        let limitBarColor = 'bg-blue-600';
+        let limitBarWidth = pct;
+
+        if (catLimit > 0) {
+          const limitPct = Math.round((amt / catLimit) * 100);
+          limitBarWidth = Math.min(limitPct, 100);
+
+          if (amt > catLimit) {
+            limitBarColor = 'bg-rose-500';
+            limitStatusHTML = `<span class="text-rose-600 dark:text-rose-400 font-extrabold text-[10px]">Over Limit (${formatINR(amt)} / ${formatINR(catLimit)})</span>`;
+          } else if (limitPct >= 80) {
+            limitBarColor = 'bg-amber-500';
+            limitStatusHTML = `<span class="text-amber-600 dark:text-amber-400 font-semibold text-[10px]">${limitPct}% of limit (${formatINR(catLimit)})</span>`;
+          } else {
+            limitBarColor = 'bg-emerald-500';
+            limitStatusHTML = `<span class="text-slate-500 dark:text-slate-400 text-[10px]">${limitPct}% of ${formatINR(catLimit)}</span>`;
+          }
+        }
 
         html += `
-          <div class="space-y-1">
+          <div class="space-y-1.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
             <div class="flex items-center justify-between text-xs">
               <div class="flex items-center gap-2">
                 <span class="p-1 rounded-md ${config.color}">
-                  <i data-lucide="${config.icon}" class="w-3.5 h-3.5"></i>
+                  <i data-lucide="${config.icon || 'tag'}" class="w-3.5 h-3.5"></i>
                 </span>
                 <span class="font-semibold text-slate-800 dark:text-slate-200">${cat}</span>
                 ${config.essential ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold">Fixed</span>' : ''}
@@ -1516,8 +1644,9 @@
                 <span class="text-slate-400 text-[11px] ml-1">(${pct}%)</span>
               </div>
             </div>
-            <div class="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-              <div class="h-full rounded-full" style="width: ${pct}%; background-color: ${colorMap[cat] || '#3b82f6'};"></div>
+            ${limitStatusHTML ? `<div class="flex justify-end">${limitStatusHTML}</div>` : ''}
+            <div class="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-300 ${limitBarColor}" style="width: ${catLimit > 0 ? limitBarWidth : pct}%;"></div>
             </div>
           </div>
         `;
@@ -1597,13 +1726,13 @@
         `;
 
         dayItems.forEach(item => {
-          const config = CATEGORY_MAP[item.category] || { icon: 'tag', color: 'text-slate-500 bg-slate-100 dark:bg-slate-800', essential: false };
+          const config = CATEGORY_MAP[item.category] || { icon: 'tag', color: 'text-slate-500 bg-slate-100 dark:bg-slate-800', essential: false, limit: 0 };
           
           fullHTML += `
             <div class="p-3.5 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
               <div class="flex items-center gap-3 min-w-0">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${config.color}">
-                  <i data-lucide="${config.icon}" class="w-5 h-5"></i>
+                  <i data-lucide="${config.icon || 'tag'}" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
@@ -1675,8 +1804,7 @@
     currentSelectedMonth = `${yr}-${mo}`;
     document.getElementById('selectedMonthInput').value = currentSelectedMonth;
 
-    populateEditCategories();
-    onCategorySelectChange();
+    populateCategoryDropdowns();
     lucide.createIcons();
   </script>
 </body>
